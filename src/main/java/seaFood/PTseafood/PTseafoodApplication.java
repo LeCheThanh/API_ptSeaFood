@@ -14,17 +14,16 @@ import seaFood.PTseafood.service.UserService;
 
 import java.math.BigInteger;
 import java.util.HashSet;
-@EnableJpaRepositories
 @SpringBootApplication
 public class PTseafoodApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(PTseafoodApplication.class, args);
 	}
-	@Bean
-	BCryptPasswordEncoder bCryptPasswordEncoder(){
-		return new BCryptPasswordEncoder();
-	}
+//	@Bean
+//	BCryptPasswordEncoder bCryptPasswordEncoder(){
+//		return new BCryptPasswordEncoder();
+//	}
 	@Bean
 	CommandLineRunner run(UserService userService){
 		return args -> {

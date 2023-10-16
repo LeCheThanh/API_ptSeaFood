@@ -34,7 +34,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public void addtoUser(String email, String roleName) {
-        User user = userRepository.findbyEmail(email);
+        User user = userRepository.findbyEmail(email).get();
         Role role = roleRepository.findByName(roleName);
         user.getRoles().add(role);
     }
