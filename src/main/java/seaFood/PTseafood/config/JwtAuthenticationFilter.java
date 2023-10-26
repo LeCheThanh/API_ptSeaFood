@@ -28,7 +28,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private static final String Secret_key="123";
+    private static final String Secret_key="secretkey_seafd";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -45,10 +45,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
                 Arrays.stream(roles).forEach(role->{
                     authorities.add(new SimpleGrantedAuthority(role));
+
                 });
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(username,null, authorities);
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
                 filterChain.doFilter(request,response);
+                System.out.println("Authorities: " + authorities);
             }catch (Exception ex){
                 response.setHeader("error", ex.getMessage());
                 response.setStatus(FORBIDDEN.value());

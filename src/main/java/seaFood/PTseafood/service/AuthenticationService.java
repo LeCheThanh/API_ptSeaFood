@@ -14,6 +14,7 @@ import seaFood.PTseafood.repository.IRoleCustomRepository;
 import seaFood.PTseafood.repository.IUserRepository;
 
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 @Service
 @RequiredArgsConstructor
@@ -40,20 +41,24 @@ public class AuthenticationService {
 //        var jwtToken = jwtService.generateToken(user, authorities);
 //        var jwtRefreshToken = jwtService.generateRefreshToken(user, authorities);
 //        return AuthenticationReponse.builder().token(jwtToken).refreshToken(jwtRefreshToken).build();
-        try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getEmail(), authenticationRequest.getPassword()));
-        } catch (AuthenticationException e) {
-            // Xử lý ngoại lệ xác thực không thành công ở đây
-            throw new RuntimeException("Authentication failed: " + e.getMessage());
-        }
-
+//        try {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getEmail(), authenticationRequest.getPassword()));
         User user = userRepository.findbyEmail(authenticationRequest.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
-        // Xử lý và gán vai trò cho người dùng tại đây
+        List<Role> role = null;
+        if(user != null){
+            role = roleCustomRepository.getRole(user);
+        }
+        // Xử lý và gán vai trò cho người dùng
 
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        user.getRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority(role.getName())));
+        Set<Role> set = new HashSet<>();
+        role.stream().forEach(r->set.add(new Role(r.getName())));
+        user.setRoles(set);
+
+         ///
+        set.stream().forEach(r->authorities.add(new SimpleGrantedAuthority(r.getName())));
+//        user.getRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority(role.getName())));
 
         var jwtToken = jwtService.generateToken(user, authorities);
         var jwtRefreshToken = jwtService.generateRefreshToken(user, authorities);
@@ -62,6 +67,11 @@ public class AuthenticationService {
                 .token(jwtToken)
                 .refreshToken(jwtRefreshToken)
                 .build();
+//        } catch (AuthenticationException e) {
+//            // Xử lý ngoại lệ xác thực không thành công
+//
+//                throw new ExecutionException("Authentication failed: " + e.getMessage());
+//        }
 
     }
 }

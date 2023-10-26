@@ -14,14 +14,14 @@ import java.util.stream.Collectors;
 
 @Service
 public class JwtService {
-    private static final String Secret_key="123";
+    private static final String Secret_key="secretkey_seafd";
 
     public String generateToken(User user, Collection<SimpleGrantedAuthority> authorities){
         //generate token use Jwt depen
         Algorithm algorithm = Algorithm.HMAC256(Secret_key.getBytes());
         return JWT.create()
                 .withSubject(user.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() +50 *60 * 1000))
+                .withExpiresAt(new Date(System.currentTimeMillis() +30*60 * 1000))
                 .withClaim("roles",authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
                 .sign(algorithm);
     }
@@ -30,7 +30,8 @@ public class JwtService {
         Algorithm algorithm = Algorithm.HMAC256(Secret_key.getBytes());
         return JWT.create()
                 .withSubject(user.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() +70 *60 * 1000))
+                .withExpiresAt(new Date(System.currentTimeMillis() +40 *60 * 1000))
+                .withClaim("roles",authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
                 .sign(algorithm);
     }
 }
