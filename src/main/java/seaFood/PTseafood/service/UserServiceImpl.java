@@ -2,41 +2,71 @@ package seaFood.PTseafood.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import seaFood.PTseafood.common.Enum;
+import seaFood.PTseafood.dto.RegisterRequest;
 import seaFood.PTseafood.entity.Role;
 import seaFood.PTseafood.entity.User;
 import seaFood.PTseafood.repository.IRoleRepository;
 import seaFood.PTseafood.repository.IUserRepository;
 
+import java.util.Optional;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl {
 
     @Autowired
     private IUserRepository userRepository;
     @Autowired
     private IRoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoderl;
-    @Override
-    public User saveUser(User user) {
-        user.setPassword(passwordEncoderl.encode(user.getPassword()));
-        return userRepository.save(user);
-    }
+    private final PasswordEncoder passwordEncoder;
+//    @Override
+    public void saveUser(RegisterRequest registerRequest) {
+        var user = new User();
+        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+        user.setEmail(registerRequest.getEmail());
+//        user.setRank(Enum.Rank.unRank);
+//        user.setAddress(null);
+//        user.setPhone(null);
+//        user.setWholeSale(false);
+//        user.setDiscountRate(0);
+//        user.setFullName("");
+//        user.setRank("");
+//        user.setTotalPurchaseAmount(new BigInteger("0"));
 
-    @Override
+//        user.setPassword(passwordEncoderl.encode(user.getPassword()));
+          userRepository.save(user);
+//        Long userId = userRepository.getUserIdByEmail(user.getEmail());
+//        Long roleId = roleRepository.getRoleIdByName("user");
+//        if(roleId != 0 && userId != 0)
+//        {
+//            userRepository.addRoleToUser(userId, roleId);
+//        }
+        String email = user.getEmail();
+        if( email != null)
+        {
+            this.addtoUser(email, "User");
+        }
+    }
+    public Optional<User> getById(Long id){
+        return userRepository.findById(id);
+    }
+//    @Override
     public Role saveRole(Role role) {
         return roleRepository.save(role);
     }
 
-    @Override
+//    @Override
     public void addtoUser(String email, String roleName) {
         User user = userRepository.findbyEmail(email).get();
         Role role = roleRepository.findByName(roleName);
         user.getRoles().add(role);
     }
+
+
 }
 

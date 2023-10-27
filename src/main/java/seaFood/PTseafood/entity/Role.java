@@ -26,8 +26,6 @@ public class Role {
 //    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
 //    private List<User> users = new ArrayList<>();
     @ManyToMany(mappedBy = "roles")
-    @Fetch(value = FetchMode.SELECT)
-    @JsonIgnore
     private Set<User> user = new HashSet<>();
 
     public Role(Long id, String name) {

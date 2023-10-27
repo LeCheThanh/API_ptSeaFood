@@ -10,7 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import seaFood.PTseafood.entity.Role;
 import seaFood.PTseafood.entity.User;
-import seaFood.PTseafood.service.UserService;
+//import seaFood.PTseafood.service.UserService;
 
 import java.math.BigInteger;
 import java.util.HashSet;
@@ -24,25 +24,25 @@ public class PTseafoodApplication {
 //	BCryptPasswordEncoder bCryptPasswordEncoder(){
 //		return new BCryptPasswordEncoder();
 //	}
-	@Bean
-	CommandLineRunner run(UserService userService){
-		return args -> {
-			userService.saveRole(new Role(null,"User"));
-			userService.saveRole(new Role(null,"Manager"));
-			userService.saveRole(new Role(null,"Admin"));
-
-			userService.saveUser(
-					new User(null,"chethanh3112@gmail.com","CheThanh Le",
-							"123456","091831213",false,
-							"quan 9","Vang",
-							10,new BigInteger("200000000"),new HashSet<>()));
-			userService.saveUser(
-					new User(null,"chethanh@gmail.com","CheThanh",
-							"123456789","091831213",true,
-							"quan 9","Vang",
-							20,new BigInteger("200000000"),new HashSet<>()));
-			userService.addtoUser("chethanh3112@gmail.com","User");
-			userService.addtoUser("chethanh@gmail.com","Admin");
-		};
-	}
+//	@Bean
+//	CommandLineRunner run(UserService userService){
+//		return args -> {
+//			userService.saveRole(new Role(null,"User"));
+//			userService.saveRole(new Role(null,"Manager"));
+//			userService.saveRole(new Role(null,"Admin"));
+//
+//			userService.saveUser(
+//					new User(null,"chethanh3112@gmail.com","CheThanh Le",
+//							"123456","091831213",false,
+//							"quan 9","Vang",
+//							10,new BigInteger("200000000"),new HashSet<>()));
+//			userService.saveUser(
+//					new User(null,"chethanh@gmail.com","CheThanh",
+//							"123456789","091831213",true,
+//							"quan 9","Vang",
+//							20,new BigInteger("200000000"),new HashSet<>()));
+//			userService.addtoUser("chethanh3112@gmail.com","User");
+//			userService.addtoUser("chethanh@gmail.com","Admin");
+//		};
+//	}
 }

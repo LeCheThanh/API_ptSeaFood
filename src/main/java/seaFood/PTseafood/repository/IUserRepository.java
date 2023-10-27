@@ -11,4 +11,10 @@ import java.util.Optional;
 public interface IUserRepository extends JpaRepository<User,Long> {
     @Query("SELECT u FROM User u WHERE u.email = ?1")
     Optional<User> findbyEmail(String email);
+
+    @Query("SELECT u.id FROM User u WHERE u.email = ?1")
+    Long getUserIdByEmail(String email);
+
+    @Query(value = "INSERT INTO user_roles (user_id, role_id) VALUES (?1, ?2)", nativeQuery = true)
+    void addRoleToUser(Long userId, Long roleId);
 }

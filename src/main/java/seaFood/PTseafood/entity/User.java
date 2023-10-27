@@ -4,6 +4,7 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import seaFood.PTseafood.common.Enum;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -24,19 +25,20 @@ public class User implements UserDetails {
     @Column(name = "fullname")
     private String fullName;
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "password")
     private String password;
 
-    @Column(name = "phone", nullable = false)
+    @Column(name = "phone")
     private String phone;
 
     @Column(name= "wholesale")
     private boolean wholeSale;
 
-    @Column(name= "address", nullable = false)
+    @Column(name= "address")
     private String address;
 
     @Column(name= "user_rank")
+//    @Enumerated(EnumType.STRING)
     private String rank;
 
     @Column(name = "discount_rate")
@@ -53,9 +55,13 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Collection<SimpleGrantedAuthority>authorities = new ArrayList<>();
-        roles.stream().forEach(r->authorities.add(new SimpleGrantedAuthority(r.getName())));
-        return  List.of(new SimpleGrantedAuthority(authorities.toString()));
+//        Collection<SimpleGrantedAuthority>authorities = new ArrayList<>();
+//        roles.stream().forEach(r->authorities.add(new SimpleGrantedAuthority(r.getName())));
+//        return  List.of(new SimpleGrantedAuthority(authorities.toString()));
+        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        roles.stream().forEach(i -> authorities.add(new SimpleGrantedAuthority(i.getName())));
+        System.out.println("List role: "+authorities);
+        return  authorities;
     }
 
     @Override
