@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import seaFood.PTseafood.common.Enum;
 import seaFood.PTseafood.dto.RegisterRequest;
 import seaFood.PTseafood.entity.Role;
 import seaFood.PTseafood.entity.User;
@@ -28,6 +29,8 @@ public class UserService {
         var user = new User();
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setEmail(registerRequest.getEmail());
+        user.setRank(Enum.Rank.unRank);
+        user.setProvider(Enum.Provider.LOCAL);
 //        user.setRank(Enum.Rank.unRank);
 //        user.setAddress(null);
 //        user.setPhone(null);
@@ -47,7 +50,7 @@ public class UserService {
         String email = user.getEmail();
         if( email != null)
         {
-            this.addtoUser(email, "User");
+            this.addtoUser(email, Enum.Role.User);
         }
     }
     public Optional<User> getById(Long id){
@@ -59,9 +62,9 @@ public class UserService {
     }
 
 //    @Override
-    public void addtoUser(String email, String roleName) {
+    public void addtoUser(String email, Enum.Role rolename) {
         User user = userRepository.findbyEmail(email).get();
-        Role role = roleRepository.findByName(roleName);
+        Role role = roleRepository.findByName(rolename.getName());
         user.getRoles().add(role);
     }
 

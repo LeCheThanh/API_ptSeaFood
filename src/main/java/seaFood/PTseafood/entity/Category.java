@@ -25,7 +25,7 @@ public class Category {
 
     private String slug;
 
-    @OneToMany(mappedBy="category" )
+    @OneToMany(mappedBy="category",cascade = CascadeType.ALL )
     private Set<Product> products;
 
 }

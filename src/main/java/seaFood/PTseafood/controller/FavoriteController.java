@@ -9,7 +9,6 @@ import seaFood.PTseafood.entity.User;
 import seaFood.PTseafood.service.FavoriteService;
 import seaFood.PTseafood.service.ProductService;
 import seaFood.PTseafood.service.UserService;
-import seaFood.PTseafood.service.UserServiceImpl;
 
 import java.util.List;
 import java.util.Optional;
@@ -43,12 +42,12 @@ public class FavoriteController {
     public ResponseEntity<?> addToFavorite(@RequestParam Long userId, @RequestParam Long productId){
         Optional<User> userOptional = userService.getById(userId);
         if (userOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.badRequest().body("sai user id");
         }
         User user = userOptional.get();
         Product product = productService.getById(productId);
         if (product == null) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.badRequest().body("sai productid");
         }
         Favorite favorite = favoriteService.addToFavorites(user, product);
         return ResponseEntity.ok(favorite);

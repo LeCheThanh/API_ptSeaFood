@@ -38,14 +38,21 @@ public class User implements UserDetails {
     private String address;
 
     @Column(name= "user_rank")
-//    @Enumerated(EnumType.STRING)
-    private String rank;
+    @Enumerated(EnumType.STRING)
+    private Enum.Rank rank;
 
     @Column(name = "discount_rate")
     private int discountRate;
 
     @Column(name="total_purchase_amount")
     private BigInteger totalPurchaseAmount;
+
+    @Enumerated(EnumType.STRING)
+    private Enum.Provider provider;
+
+
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+//    private List<Favorite> favorites = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(name = "user_role",
@@ -55,9 +62,6 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-//        Collection<SimpleGrantedAuthority>authorities = new ArrayList<>();
-//        roles.stream().forEach(r->authorities.add(new SimpleGrantedAuthority(r.getName())));
-//        return  List.of(new SimpleGrantedAuthority(authorities.toString()));
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
         roles.stream().forEach(i -> authorities.add(new SimpleGrantedAuthority(i.getName())));
         System.out.println("List role: "+authorities);
