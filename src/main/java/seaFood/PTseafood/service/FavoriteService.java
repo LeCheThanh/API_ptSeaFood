@@ -16,7 +16,7 @@ public class FavoriteService {
     @Autowired
     private IFavoriteRepository favoriteRepository;
     @Autowired
-    private UserServiceImpl userService;
+    private UserService userService;
     //Lấy tất cả sản phẩm trong ds yêu thích của user
     public List<Favorite> getFavoritesByUser(Long id) {
         Optional<User> userOptional  = userService.getById(id);
