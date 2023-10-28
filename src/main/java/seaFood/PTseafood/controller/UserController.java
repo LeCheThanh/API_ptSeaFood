@@ -6,8 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import seaFood.PTseafood.dto.RegisterRequest;
 import seaFood.PTseafood.entity.User;
 import seaFood.PTseafood.repository.IUserRepository;
-//import seaFood.PTseafood.service.UserService;
-import seaFood.PTseafood.service.UserServiceImpl;
+import seaFood.PTseafood.service.UserService;
 import seaFood.PTseafood.utils.EmailValidator;
 import seaFood.PTseafood.utils.PasswordUtil;
 
@@ -20,7 +19,7 @@ public class UserController {
     @Autowired
     IUserRepository userRepository;
     @Autowired
-    private UserServiceImpl userService;
+    private UserService userService;
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody RegisterRequest registerRequest){

@@ -3,13 +3,12 @@ package seaFood.PTseafood.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import seaFood.PTseafood.entity.Category;
 import seaFood.PTseafood.entity.Favorite;
 import seaFood.PTseafood.entity.Product;
 import seaFood.PTseafood.entity.User;
-import seaFood.PTseafood.service.CategoryService;
 import seaFood.PTseafood.service.FavoriteService;
 import seaFood.PTseafood.service.ProductService;
+import seaFood.PTseafood.service.UserService;
 import seaFood.PTseafood.service.UserServiceImpl;
 
 import java.util.List;
@@ -22,7 +21,7 @@ public class FavoriteController {
     @Autowired
     FavoriteService favoriteService;
     @Autowired
-    UserServiceImpl userService;
+    UserService userService;
     @Autowired
     ProductService productService;
 

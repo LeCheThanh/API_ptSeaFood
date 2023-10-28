@@ -7,7 +7,6 @@ import seaFood.PTseafood.entity.Product;
 import seaFood.PTseafood.entity.User;
 import seaFood.PTseafood.exception.ResourceNotFoundException;
 import seaFood.PTseafood.repository.IFavoriteRepository;
-import seaFood.PTseafood.repository.IUserRepository;
 
 import java.util.List;
 import java.util.Optional;
