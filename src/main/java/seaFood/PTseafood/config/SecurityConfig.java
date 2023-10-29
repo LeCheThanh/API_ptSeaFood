@@ -25,7 +25,6 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity
-
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -38,7 +37,7 @@ public class SecurityConfig {
 //        http.sessionManagement().sessionCreationPolicy(STATELESS);
         http.authorizeRequests()
                 .requestMatchers(HttpMethod.OPTIONS,"/**").permitAll()
-                .requestMatchers("/api/v1/auth/**","/api/user/**","/api/admin/**","/api/favorite/**").permitAll()
+                .requestMatchers("/api/v1/auth/**","/api/user/**","/api/admin/**","/api/favorite/**","/api/**","/api/upload").permitAll()
                 .requestMatchers("/demo").hasAuthority("Admin")
                 .anyRequest()
                 .authenticated()
