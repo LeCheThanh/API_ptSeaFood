@@ -60,7 +60,6 @@ public class UserService {
     public Role saveRole(Role role) {
         return roleRepository.save(role);
     }
-
 //    @Override
     public void addtoUser(String email, Enum.Role rolename) {
         User user = userRepository.findbyEmail(email).get();
