@@ -63,4 +63,7 @@ public class ProductService {
                 }
                 return null;
     }
+    public List<Product> findByNameContaining (String keyword){
+        return productRepository.findByNameContaining(keyword);
+    }
 }

@@ -65,5 +65,10 @@ public class ProductController {
             reponse.put("deleted",Boolean.TRUE);
             return ResponseEntity.ok(reponse);
     }
+    @GetMapping("/search")
+    public List<Product> searchProducts(@RequestParam String keyword) {
+        List<Product> products = productService.findByNameContaining(keyword);
+        return products;
+    }
 
 }
