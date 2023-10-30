@@ -4,7 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import seaFood.PTseafood.dto.RegisterRequest;
+import seaFood.PTseafood.dto.UpdateUserRequest;
 import seaFood.PTseafood.entity.User;
+import seaFood.PTseafood.exception.ResourceNotFoundException;
 import seaFood.PTseafood.repository.IUserRepository;
 import seaFood.PTseafood.service.UserService;
 import seaFood.PTseafood.utils.EmailValidator;
@@ -35,6 +37,15 @@ public class UserController {
         }
         userService.saveUser(registerRequest);
         return ResponseEntity.ok("đăng kí thành công");
+    }
+    @PutMapping("/{userId}")
+    public ResponseEntity<?> updateUser(@PathVariable Long userId, @RequestBody UpdateUserRequest updatedUser) {
+        try {
+            User updatedUserInfo = userService.updateUser(userId, updatedUser);
+            return ResponseEntity.ok("Cập nhật thành công\n"+updatedUser);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
 }

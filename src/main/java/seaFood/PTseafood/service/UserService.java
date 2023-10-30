@@ -7,8 +7,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import seaFood.PTseafood.common.Enum;
 import seaFood.PTseafood.dto.RegisterRequest;
+import seaFood.PTseafood.dto.UpdateUserRequest;
 import seaFood.PTseafood.entity.Role;
 import seaFood.PTseafood.entity.User;
+import seaFood.PTseafood.exception.ResourceNotFoundException;
 import seaFood.PTseafood.repository.IRoleRepository;
 import seaFood.PTseafood.repository.IUserRepository;
 
@@ -31,27 +33,24 @@ public class UserService {
         user.setEmail(registerRequest.getEmail());
         user.setRank(Enum.Rank.unRank);
         user.setProvider(Enum.Provider.LOCAL);
-//        user.setRank(Enum.Rank.unRank);
-//        user.setAddress(null);
-//        user.setPhone(null);
-//        user.setWholeSale(false);
-//        user.setDiscountRate(0);
-//        user.setFullName("");
-//        user.setRank("");
-//        user.setTotalPurchaseAmount(new BigInteger("0"));
-//        user.setPassword(passwordEncoderl.encode(user.getPassword()));
-          userRepository.save(user);
-//        Long userId = userRepository.getUserIdByEmail(user.getEmail());
-//        Long roleId = roleRepository.getRoleIdByName("user");
-//        if(roleId != 0 && userId != 0)
-//        {
-//            userRepository.addRoleToUser(userId, roleId);
-//        }
+        userRepository.save(user);
         String email = user.getEmail();
         if( email != null)
         {
             this.addtoUser(email, Enum.Role.User);
         }
+    }
+    //update thong tin co ban
+    public User updateUser(Long userId, UpdateUserRequest updatedUser) {
+        User existingUser = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        // Cập nhật thông tin người dùng với dữ liệu từ updatedUser
+        existingUser.setFullName(updatedUser.getFullName());
+        existingUser.setPhone(updatedUser.getPhone());
+        existingUser.setAddress(updatedUser.getAddress());
+        // Lưu thông tin người dùng đã cập nhật
+        return userRepository.save(existingUser);
     }
     public Optional<User> getById(Long id){
         return userRepository.findById(id);
