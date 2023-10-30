@@ -22,7 +22,7 @@ public class UploadController {
     public ResponseEntity<String> uploadImage(@RequestParam("image") MultipartFile file) {
         JSONObject responseJson = new JSONObject();
         try {
-            System.out.println("SADASODASJDSAJDOAS     "+file.getSize());
+//            System.out.println("SADASODASJDSAJDOAS     "+file.getSize());
             // Kiểm tra xem tệp tin có tồn tại và không rỗng không
             if (file == null || file.isEmpty()) {
                 return ResponseEntity.ok().body("Vui lòng chọn một tệp tin ảnh.");
