@@ -87,6 +87,8 @@ public class UserService {
             }
         }
         user.setRoles(updatedRoles);
+        System.out.println(updatedRoles);
+//        addtoUser()
         userRepository.save(user);
     }
     ///---------------------------------
