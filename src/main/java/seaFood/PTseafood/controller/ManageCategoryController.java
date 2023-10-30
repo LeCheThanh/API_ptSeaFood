@@ -14,7 +14,7 @@ import java.util.Map;
 @CrossOrigin
 @RestController
 @RequestMapping("/api/admin")
-public class CategoryController {
+public class ManageCategoryController {
     @Autowired
     CategoryService categoryService;
 
