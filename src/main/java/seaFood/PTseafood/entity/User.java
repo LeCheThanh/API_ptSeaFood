@@ -25,13 +25,13 @@ public class User implements UserDetails {
     @Column(name = "fullname")
     private String fullName;
 
-    @Column(name = "password")
+    @Column(name = "password", nullable = false)
     private String password;
 
     @Column(name = "phone")
     private String phone;
 
-    @Column(name= "wholesale")
+    @Column(name= "wholesale", nullable = false)
     private boolean wholeSale;
 
     @Column(name= "address")
