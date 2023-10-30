@@ -1,5 +1,6 @@
 package seaFood.PTseafood.controller;
 
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -9,6 +10,7 @@ import seaFood.PTseafood.exception.RoleNotFoundException;
 import seaFood.PTseafood.service.UserService;
 
 import java.util.List;
+import java.util.MissingFormatWidthException;
 
 @CrossOrigin
 @RestController
@@ -42,6 +44,17 @@ public class ManageUserController {
     @Scheduled(cron = "* * * * * ?")// Cập nhật theo rank ngay lập tức(mỗi giây)
     public void updateDiscount() {
         userService.updateDiscountBasedOnRank();
+    }
+
+    @PostMapping("/user/{id}")
+    public ResponseEntity<?> updateWhosale(@PathVariable Long id, @RequestParam boolean newStatus){
+        try{
+            userService.updateWhosale(id,newStatus);
+            return ResponseEntity.ok("thay đổi quyền mua sỉ thành công");
+        }
+        catch (ResourceNotFoundException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
 }

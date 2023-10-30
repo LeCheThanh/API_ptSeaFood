@@ -126,5 +126,14 @@ public class UserService {
             userRepository.save(user);
         }
     }
+
+    public void updateWhosale(Long id,boolean newStatus){
+        Optional<User> existingUser = userRepository.findById(id);
+        if(existingUser.isPresent()){
+            User user = existingUser.get();
+            user.setWholeSale(newStatus);
+            userRepository.save(user);
+        }else throw new ResourceNotFoundException("User not found");
+    }
 }
 
