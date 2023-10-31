@@ -137,5 +137,6 @@ public class UserService {
             userRepository.save(user);
         }else throw new ResourceNotFoundException("User not found");
     }
+
 }
 

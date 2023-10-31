@@ -18,11 +18,11 @@ import java.util.Optional;
 @RequestMapping("/api/favorite")
 public class FavoriteController {
     @Autowired
-    FavoriteService favoriteService;
+    private FavoriteService favoriteService;
     @Autowired
-    UserService userService;
+    private UserService userService;
     @Autowired
-    ProductService productService;
+    private ProductService productService;
 
     //GetAll
     @GetMapping("/all/{id}")

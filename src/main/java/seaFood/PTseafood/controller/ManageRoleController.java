@@ -16,7 +16,7 @@ import java.util.List;
 @RequestMapping("/api/admin")
 public class ManageRoleController {
     @Autowired
-    IRoleRepository roleRepository;
+    private IRoleRepository roleRepository;
     @GetMapping("/roles")
     public ResponseEntity<?>getAll(){
         List<Role> role = roleRepository.findAll();

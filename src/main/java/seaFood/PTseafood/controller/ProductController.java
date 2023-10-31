@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/product")
 public class ProductController {
     @Autowired
-    ProductService productService;
+    private ProductService productService;
     @GetMapping("/search")
     public ResponseEntity<?> search(@RequestParam("keyword") String keyword)  { // dùng chấm hỏi chỗ <?> để cho
         // kiểu đại diện vì phải trả về message và list book!

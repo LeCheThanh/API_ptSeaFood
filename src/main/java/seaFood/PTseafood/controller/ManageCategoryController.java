@@ -16,7 +16,7 @@ import java.util.Map;
 @RequestMapping("/api/admin")
 public class ManageCategoryController {
     @Autowired
-    CategoryService categoryService;
+    private CategoryService categoryService;
 
     //GetAll
     @GetMapping("/categories")

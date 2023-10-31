@@ -9,6 +9,7 @@ import seaFood.PTseafood.entity.Product;
 import seaFood.PTseafood.exception.ResourceNotFoundException;
 import seaFood.PTseafood.service.CategoryService;
 import seaFood.PTseafood.service.ProductService;
+import seaFood.PTseafood.service.ProductVariantService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,9 +21,12 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/admin")
 public class ManageProductController {
     @Autowired
-    CategoryService categoryService;
+    private CategoryService categoryService;
     @Autowired
-    ProductService productService;
+    private ProductService productService;
+
+    @Autowired
+    private ProductVariantService productVariantService;
     //GetAll
     @GetMapping("/products")
     public List<Product> getAllProduct() {
@@ -33,7 +37,9 @@ public class ManageProductController {
     @PostMapping("/product")
     public ResponseEntity<?> addProduct(@RequestBody Product product) {
         try{
+
             Product addproduct= productService.addProduct(product);
+
             return ResponseEntity.ok(addproduct);
         }catch (Exception ex){
             return ResponseEntity.badRequest().body("Thêm sản phẩm thất bại "+ ex.getMessage());
