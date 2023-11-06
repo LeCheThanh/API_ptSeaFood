@@ -3,8 +3,10 @@ package seaFood.PTseafood.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 import seaFood.PTseafood.dto.CartItemRequest;
+import seaFood.PTseafood.dto.UpdateCartRequest;
 import seaFood.PTseafood.entity.CartItem;
 import seaFood.PTseafood.entity.User;
 import seaFood.PTseafood.exception.ResourceNotFoundException;
@@ -65,6 +67,43 @@ public class CartController {
 
             return ResponseEntity.ok(totalValue);
         } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @Scheduled(fixedRate = 1000) // Cứ mỗi gây
+    public void updateCartsJob() {
+        cartService.autoDelProOutOfStock();
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<?> updateCartItem(@RequestBody UpdateCartRequest updateRequest, HttpServletRequest request) {
+        try {
+            User user = jwtUtil.getUserFromToken(request);
+            CartItem updatedCartItem = cartService.updateCartItem(updateRequest, user);
+            return ResponseEntity.ok(updatedCartItem);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/remove/{cartItemId}")
+    public ResponseEntity<String> removeCartItem(@PathVariable Long cartItemId, HttpServletRequest request) {
+        try {
+            User user = jwtUtil.getUserFromToken(request);
+            cartService.removeCartItem(cartItemId, user);
+            return ResponseEntity.ok("Sản phẩm đã được xóa khỏi giỏ hàng.");
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    @DeleteMapping("/clear")
+    public ResponseEntity<String> clearCart(HttpServletRequest request) {
+        try {
+            User user = jwtUtil.getUserFromToken(request);
+            cartService.clearCart(user);
+            return ResponseEntity.ok("Giỏ hàng đã được xóa.");
+        } catch (ResourceNotFoundException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
