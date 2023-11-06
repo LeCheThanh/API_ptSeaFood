@@ -4,6 +4,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import seaFood.PTseafood.dto.ProductProductVariantRequest;
 import seaFood.PTseafood.dto.ProductVariantRequest;
@@ -38,6 +39,7 @@ public class ManageProductController {
         return products;
     }
     //Create
+
     @PostMapping("/product")
     public ResponseEntity<?> addProduct(@RequestBody ProductProductVariantRequest productProductVariantRequest) {
         try{

@@ -1,14 +1,20 @@
 package seaFood.PTseafood.service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+import seaFood.PTseafood.auth.AuthenticationRequest;
+import seaFood.PTseafood.config.JwtAuthenticationFilter;
 import seaFood.PTseafood.dto.CartItemRequest;
 import seaFood.PTseafood.entity.CartItem;
 import seaFood.PTseafood.entity.Product;
 import seaFood.PTseafood.entity.ProductVariant;
+import seaFood.PTseafood.entity.User;
 import seaFood.PTseafood.exception.ResourceNotFoundException;
+import seaFood.PTseafood.repository.ICartRepository;
+import seaFood.PTseafood.utils.JwtUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,10 +26,15 @@ public class CartService {
     private ProductService productService;
     @Autowired
     private ProductVariantService productVariantService;
-    public String generateCartItemId(Long productId, Long productVariantId) {
-        return DigestUtils.md5DigestAsHex((productId + "_" + productVariantId).getBytes());
-    }
-        public CartItem  add (CartItemRequest cartItemRequest){
+    @Autowired
+    private AuthenticationService authenticationService;
+
+    @Autowired
+    private ICartRepository cartRepository;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+    public CartItem  add (CartItemRequest cartItemRequest,User user){
             int quantity = cartItemRequest.getQuantity();
             Long productId = cartItemRequest.getProductId();
             Long productVariantId = cartItemRequest.getProductVariantId();
@@ -51,42 +62,38 @@ public class CartService {
             // Kiểm tra số lượng cần mua có đủ không
             if (productVariant.getStock() < quantity) {
                 // Thực hiện xử lý lỗi và trả về false
-                throw new ResourceNotFoundException("Số lượng sản phẩm chỉ còn lại "+quantity);
+                throw new ResourceNotFoundException("Số lượng sản phẩm chỉ còn lại "+productVariant.getStock() );
             }
 
             CartItem cartItem = new CartItem();
-            cartItem.setCartItemId(generateCartItemId(productId, productVariantId)); // Tạo cartItemId mới
-            cartItem.setProductId(productId);
-            cartItem.setProductVariantId(productVariantId);
+            cartItem.setProduct(product);
+            cartItem.setProductVariant(productVariant);
             cartItem.setQuantity(quantity);
             cartItem.setProduct(product);
             cartItem.setProductVariant(productVariant);
             double price = productVariant.getPrice();
             double totalPrice = price * quantity;
+            cartItem.setUser(user);
             cartItem.setTotal(totalPrice);
 
 
-            return cartItem;
+
+            return cartRepository.save(cartItem);
         }
-//    public List<CartItem> getCartItems(HttpSession session) {
-//        Map<String, CartItem> carts = (Map<String, CartItem>) session.getAttribute("carts");
-//        List<CartItem> cartItems = new ArrayList<>();
-//
-//        if (carts != null) {
-//            cartItems.addAll(carts.values());
-//
-//            for (CartItem cartItem : cartItems) {
-//                String cartItemId = cartItem.getCartItemId();
-//                Long productId = cartItem.getProductId();
-//                Product product = productService.getById(cartItem.getProductId());
-//                ProductVariant productVariant = productVariantService.getById(cartItem.getProductVariantId());
-//                Long productVariantId = cartItem.getProductVariantId();
-//                int quantity = cartItem.getQuantity();
-//            }
-//        }
-//
-//        return cartItems;
-//    }
+    public List<CartItem> getCartItemsByUser(User user) {
+            return cartRepository.findAllByUser(user);
+    }
+
+    public double getTotalCartValue(User user) {
+        List<CartItem> cartItems = getCartItemsByUser(user);
+        double totalValue = 0.0;
+
+        for (CartItem cartItem : cartItems) {
+            totalValue += cartItem.getTotal();
+        }
+
+        return totalValue;
+    }
 
 
 

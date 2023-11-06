@@ -38,6 +38,10 @@ public class Product {
     private List<ProductVariant> productVariants = new ArrayList<>();
 
 //    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+//    private List<CartItem> cartItems = new ArrayList<>();
+
+
+//    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
 //    private List<Favorite> favorites = new ArrayList<>();
 
 }

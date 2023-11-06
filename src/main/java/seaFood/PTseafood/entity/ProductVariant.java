@@ -3,6 +3,9 @@ package seaFood.PTseafood.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Data
 @Table(name="product_variants")
@@ -39,4 +42,6 @@ public class ProductVariant {
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     private Product product;
 
+//    @OneToMany(mappedBy = "productVariant", cascade = CascadeType.ALL)
+//    private List<CartItem> cartItems = new ArrayList<>();
 }
