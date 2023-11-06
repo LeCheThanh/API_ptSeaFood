@@ -27,13 +27,16 @@ public class UserController {
     public ResponseEntity<?> registerUser(@RequestBody RegisterRequest registerRequest){
         Optional<User> existingUser = userRepository.findbyEmail(registerRequest.getEmail());
         if(!EmailValidator.validateEmail(registerRequest.getEmail())){
-            return ResponseEntity.badRequest().body("Email không đúng định dạng");
+            return ResponseEntity.badRequest().body("Email không đúng định dạng!");
         }
         if(existingUser.isPresent()){
-            return ResponseEntity.badRequest().body("Email đã tồn tại");
+            return ResponseEntity.badRequest().body("Email đã tồn tại!");
         }
         if(!(PasswordUtil.isStrongPassword(registerRequest.getPassword()))){
-            return ResponseEntity.badRequest().body("Mật khẩu chưa đủ mạnh");
+            return ResponseEntity.badRequest().body("Mật khẩu phải chứa ít nhất 8 kí tự bao gồm số, chữ hoa, chữ thường và ký tự đặc biệt!");
+        }
+        if(!(registerRequest.getConfirmPassword().equals(registerRequest.getPassword()))){
+            return ResponseEntity.badRequest().body("Mật khẩu và và xác nhận mật khẩu không khớp!");
         }
         userService.saveUser(registerRequest);
         return ResponseEntity.ok("đăng kí thành công");

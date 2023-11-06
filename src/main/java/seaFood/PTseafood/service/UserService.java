@@ -64,6 +64,7 @@ public class UserService {
         return roleRepository.save(role);
     }
 //    @Override
+    public Optional<User> getByEmail(String email){return userRepository.findbyEmail(email);}
     public void addtoUser(String email, Enum.Role rolename) {
         User user = userRepository.findbyEmail(email).get();
         Role role = roleRepository.findByName(rolename.getName());
