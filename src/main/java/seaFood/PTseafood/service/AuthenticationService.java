@@ -1,6 +1,7 @@
 package seaFood.PTseafood.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -10,8 +11,10 @@ import seaFood.PTseafood.auth.AuthenticationReponse;
 import seaFood.PTseafood.auth.AuthenticationRequest;
 import seaFood.PTseafood.entity.Role;
 import seaFood.PTseafood.entity.User;
+import seaFood.PTseafood.exception.ResourceNotFoundException;
 import seaFood.PTseafood.repository.IRoleCustomRepository;
 import seaFood.PTseafood.repository.IUserRepository;
+import seaFood.PTseafood.utils.JwtUtil;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -74,4 +77,20 @@ public class AuthenticationService {
 //        }
 
     }
+//    @Autowired
+//    private JwtUtil jwtUtil;
+//    @Autowired
+//    private UserService userService;
+//
+//    public User getUserFromToken(String token) {
+//        String username = jwtUtil.extractUsername(token);
+//        // Thực hiện logic để lấy thông tin người dùng (User) từ username
+//        // Ví dụ: gọi service hoặc tìm trong cơ sở dữ liệu
+//        Optional<User> user = userService.getByEmail(username);
+//        if(user.isEmpty()){
+//            throw  new ResourceNotFoundException("Không tồn tại user");
+//        }
+//        User userEx = user.get();
+//        return userEx;
+//    }
 }

@@ -34,4 +34,5 @@ public class JwtService {
                 .withClaim("roles",authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
                 .sign(algorithm);
     }
+
 }
