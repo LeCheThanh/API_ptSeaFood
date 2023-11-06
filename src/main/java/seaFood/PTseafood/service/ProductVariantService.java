@@ -6,6 +6,8 @@ import seaFood.PTseafood.entity.ProductVariant;
 import seaFood.PTseafood.repository.IProductVariantRepository;
 import seaFood.PTseafood.utils.SlugUtil;
 
+import java.util.List;
+
 @Service
 public class ProductVariantService {
     @Autowired
@@ -23,6 +25,9 @@ public class ProductVariantService {
         productVariant.setSlug(slug);
         productVariant.setSoldQuantity(0);
         return save(productVariant);
+    }
+    public List<ProductVariant> findOutOfStockProducts() {
+        return productVariantRepository.findByStock(0);
     }
 
 }
