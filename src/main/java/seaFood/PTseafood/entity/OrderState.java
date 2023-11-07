@@ -21,6 +21,11 @@ public class OrderState {
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
 
+    @Column(name = "update_at", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime updateAt;
+
+
     @ManyToOne
     @JoinColumn(name = "order_id", referencedColumnName = "id")
     private Order order;

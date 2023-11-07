@@ -1,5 +1,6 @@
 package seaFood.PTseafood.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -41,7 +42,7 @@ public class Order {
     private Double finalPrice;
 
     @Column(name = "discount_price")
-    private Double discountPrice;
+    private int discountPrice;
 
     @Column(name = "payment_method", nullable = false)
     private String paymentMethod;
@@ -50,12 +51,17 @@ public class Order {
     private String paymentStatus;
 
     @Column(name = "note")
-    private Double note;
+    private String note;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderState> orderStates = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private List<OrderDetail> orderDetails = new ArrayList<>();
  }
