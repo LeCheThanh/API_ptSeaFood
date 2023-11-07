@@ -1,5 +1,6 @@
 package seaFood.PTseafood.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -42,6 +43,11 @@ public class ProductVariant {
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     private Product product;
 
-//    @OneToMany(mappedBy = "productVariant", cascade = CascadeType.ALL)
-//    private List<CartItem> cartItems = new ArrayList<>();
+    @JsonIgnore
+    @OneToMany(mappedBy = "productVariant", cascade = CascadeType.ALL)
+    private List<CartItem> cartItems = new ArrayList<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "productVariant", cascade = CascadeType.ALL)
+    private List<OrderDetail> orderDetails = new ArrayList<>();
 }
