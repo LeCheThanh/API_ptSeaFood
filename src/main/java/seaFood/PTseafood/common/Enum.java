@@ -26,4 +26,20 @@ public class Enum {
         LOCAL,
         GOOGLE
     }
+    public enum OrderStatus {
+        PENDING_CONFIRMATION("Chờ xác nhận"),
+        SHIPPING("Đang giao"),
+        COMPLETED("Hoàn thành"),
+        CANCELED("Đã hủy");
+
+        private final String name;
+
+        OrderStatus(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+    }
 }
