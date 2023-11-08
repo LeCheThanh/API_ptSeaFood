@@ -37,8 +37,8 @@ public class SecurityConfig {
 //        http.sessionManagement().sessionCreationPolicy(STATELESS);
         http.authorizeRequests()
                 .requestMatchers(HttpMethod.OPTIONS,"/**").permitAll()
-                .requestMatchers("/api/v1/auth/**","/api/user/**","/api/admin/**","/api/favorite/**","/api/**","/api/upload").permitAll()
-                .requestMatchers("/demo").hasAuthority("Admin")
+                .requestMatchers("/api/v1/auth/**","/api/user/**","/api/admin/**","/api/**","/api/upload").permitAll()
+                .requestMatchers("/api/favorite/**","/demo").hasAuthority("Admin")
                 .anyRequest()
                 .authenticated()
                 .and()
