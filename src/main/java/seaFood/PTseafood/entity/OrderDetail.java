@@ -11,6 +11,12 @@ public class OrderDetail {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "product_name")
+    private String productName;
+
+    @Column(name = "product_variant_name")
+    private String productVariantName;
+
     @ManyToOne
     @JoinColumn(name = "order_id", referencedColumnName = "id")
     private Order order;

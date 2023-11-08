@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import seaFood.PTseafood.entity.OrderDetail;
 
 @Repository
-public interface IOrderDetailRepository extends JpaRepository<Long, OrderDetail> {
+public interface IOrderDetailRepository extends JpaRepository<OrderDetail, Long> {
 }
