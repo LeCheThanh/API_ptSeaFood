@@ -7,6 +7,7 @@ import seaFood.PTseafood.entity.Order;
 import seaFood.PTseafood.entity.OrderState;
 import seaFood.PTseafood.entity.User;
 import seaFood.PTseafood.repository.IOrderRepository;
+import seaFood.PTseafood.repository.IOrderStateRepository;
 import seaFood.PTseafood.utils.GenerateCodeUtil;
 import seaFood.PTseafood.common.Enum;
 
@@ -20,13 +21,18 @@ public class OrderService {
 
     @Autowired
     private  CartService cartService;
+    @Autowired
+    private IOrderStateRepository orderStateRepository;
+
+    @Autowired
+    private OrderDetailService orderDetailService;
     ///Admin page
     public List<Order> getAll(){return orderRepository.findAll();}
     //Search by customer
     public Order getByCode(String code){return orderRepository.findByCode(code);}
 
     //Create new Order
-    public Order create(OrderRequest orderRequest, User user){
+    public Order create(OrderRequest orderRequest, User user) throws Exception {
 
             String name = orderRequest.getReceiverName();
             String phone = orderRequest.getReceiverPhone();
@@ -34,28 +40,14 @@ public class OrderService {
             String address = orderRequest.getReceiverAddress();
             String note = orderRequest.getNote();
             String payment = orderRequest.getPayment();
-
+            if (cartService.isCartEmpty(user)) {
+                    throw new Exception("Giỏ hàng của bạn hiện đang trống. Không thể tạo đơn hàng.");
+            }
             Order order = new Order();
             order.setCreatedAt(LocalDateTime.now());
             order.setCode(GenerateCodeUtil.GenerateCodeOrder());
             order.setNote(note);
-//            order.setReceiverName(user.getFullName());
-//            order.setReceiverEmail(user.getEmail());
-//            order.setReceiverAddress(user.getAddress());
-//            order.setReceiverPhone(user.getPhone());
-//
-//            if(name!=null){
-//                order.setReceiverName(name);
-//            }
-//            if(email!=null){
-//                order.setReceiverEmail(email);
-//            }
-//            if(phone!=null){
-//                order.setReceiverPhone(phone);
-//            }
-//            if(address!=null){
-//                order.setReceiverAddress(address);
-//            }
+
             order.setUser(user);
             order.setReceiverName(name != null ? name : user.getFullName());
             order.setReceiverEmail(email != null ? email : user.getEmail());
@@ -84,13 +76,20 @@ public class OrderService {
 
         order.setFinalPrice(finalPrice);
         order.setPaymentMethod(payment);
+        order.setPaymentStatus("Ddang cho");
+
+        orderRepository.save(order);
 
         OrderState orderState = new OrderState();
         orderState.setCreatedAt(LocalDateTime.now());
+        orderState.setUpdateAt(LocalDateTime.now());
         orderState.setState(Enum.OrderStatus.PENDING_CONFIRMATION.getName());
         orderState.setOrder(order);
+        orderStateRepository.save(orderState);
+
+        orderDetailService.create(order,user);
 
 
-        return orderRepository.save(order);
+        return order;
     }
 }
