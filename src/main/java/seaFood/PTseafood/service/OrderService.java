@@ -60,11 +60,12 @@ public class OrderService {
 
             double totalPrice = cartService.getTotalCartValue(user);
             // lưu discount ở user là số nguyên vd : 10 thì 10/100 -->> 10%
-            int discountPrice = user.getDiscountRate()/100;
+            int discountRate = user.getDiscountRate();
+            System.out.println("Discount Rate: " + discountRate);
+            int discountPrice = discountRate / 100;
             double finalPrice = totalPrice*(1-discountPrice);
             // làm tròn
             finalPrice = Math.round(finalPrice);
-
         if ("momo".equalsIgnoreCase(payment)) {
             // Xử lý thanh toán qua Momo
 
