@@ -5,9 +5,11 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
+@Data
 @Setter
+@Getter
 public class CartItemRequest {
+
     private int quantity;
 
     private Long productId;

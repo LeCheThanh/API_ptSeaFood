@@ -31,7 +31,6 @@ public class CartController {
         try {
             //get user from token
             User user = jwtUtil.getUserFromToken(request);
-            System.out.println(user);
             CartItem cartItem = cartService.add(cartItemRequest, user);
             return ResponseEntity.ok("Thêm vào giỏ hàng thành công!");
         } catch (ResourceNotFoundException e) {
