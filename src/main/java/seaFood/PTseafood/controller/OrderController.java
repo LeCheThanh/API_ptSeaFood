@@ -10,6 +10,9 @@ import seaFood.PTseafood.entity.Order;
 import seaFood.PTseafood.entity.User;
 import seaFood.PTseafood.service.OrderService;
 import seaFood.PTseafood.utils.JwtUtil;
+import seaFood.PTseafood.utils.PhoneNumberValidator;
+
+import static seaFood.PTseafood.utils.PhoneNumberValidator.validateVNPhoneNumber;
 
 @CrossOrigin
 @RestController
@@ -24,6 +27,9 @@ public class OrderController {
         try {
             User user = jwtUtill.getUserFromToken(request);
             Order order = orderService.create(orderRequest, user);
+            if(PhoneNumberValidator.validateVNPhoneNumber(orderRequest.getReceiverPhone()) == false){
+                return ResponseEntity.badRequest().body("Số điện thoại không hợp lệ");
+            }
             return ResponseEntity.ok(order);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());

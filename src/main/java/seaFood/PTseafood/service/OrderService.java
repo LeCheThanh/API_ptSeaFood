@@ -87,7 +87,7 @@ public class OrderService {
         orderState.setOrder(order);
         orderStateRepository.save(orderState);
 
-        orderDetailService.create(order,user);
+//        orderDetailService.create(order,user);
 
 
         return order;
