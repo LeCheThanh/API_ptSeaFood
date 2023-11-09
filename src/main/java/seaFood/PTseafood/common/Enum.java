@@ -42,4 +42,18 @@ public class Enum {
             return name;
         }
     }
+    public enum PaymentStatus {
+        PAID("Đã thanh toán"),
+        UNPAID("Chưa thanh toán");
+
+        private final String name;
+
+        PaymentStatus(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+    }
 }

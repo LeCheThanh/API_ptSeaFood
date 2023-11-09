@@ -1,11 +1,13 @@
 package seaFood.PTseafood.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import seaFood.PTseafood.dto.OrderRequest;
 import seaFood.PTseafood.entity.Order;
 import seaFood.PTseafood.entity.OrderState;
 import seaFood.PTseafood.entity.User;
+import seaFood.PTseafood.exception.ResourceNotFoundException;
 import seaFood.PTseafood.repository.IOrderRepository;
 import seaFood.PTseafood.repository.IOrderStateRepository;
 import seaFood.PTseafood.utils.GenerateCodeUtil;
@@ -76,7 +78,7 @@ public class OrderService {
 
         order.setFinalPrice(finalPrice);
         order.setPaymentMethod(payment);
-        order.setPaymentStatus("Ddang cho");
+        order.setPaymentStatus(Enum.PaymentStatus.UNPAID.getName());
 
         orderRepository.save(order);
 
@@ -91,5 +93,45 @@ public class OrderService {
 
 
         return order;
+    }
+
+    //update State by user
+    public OrderState updateOrderStateByUser(Long orderId,User user) {
+        // Kiểm tra xem đơn hàng có tồn tại không và có thuộc về người dùng hay không
+        Order existingOrder = orderRepository.findByIdAndUser(orderId, user);
+        OrderState newOrderState = orderStateRepository.findByOrder(existingOrder);
+
+
+        if (existingOrder == null) {
+            throw new RuntimeException("Không tồn tại đơn hàng!");
+        }
+        if (newOrderState == null) {
+            throw new RuntimeException("Không tìm thấy trạng thái đơn hàng!");
+        }
+        //Chỉ cho phép cập nhật trạng thái nếu đơn hàng đang ở trạng thái đang vận chuyển
+        if (newOrderState.getState().equals( Enum.OrderStatus.SHIPPING.getName())) {
+            // Cập nhật trạng thái đơn hàng
+            newOrderState.setState(Enum.OrderStatus.COMPLETED.getName());
+
+            // Lưu cập nhật vào cơ sở dữ liệu
+            return orderStateRepository.save(newOrderState);
+        } else {
+            throw new RuntimeException("Không thể cập nhật trạng thái đơn hàng ở trạng thái hiện tại");
+        }
+    }
+
+    //update State by admin
+    @PreAuthorize("hasRole('Admin')")
+    public OrderState updateOrderStateByAdmin(Long orderId) {
+        // Kiểm tra xem đơn hàng có tồn tại không
+        Order existingOrder = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đơn hàng với ID: " + orderId));
+
+        OrderState newOrderState = orderStateRepository.findByOrder(existingOrder);
+        // Cập nhật trạng thái đơn hàng
+        newOrderState.setUpdateAt(LocalDateTime.now());
+        newOrderState.setState(Enum.OrderStatus.SHIPPING.getName());
+        // Lưu cập nhật vào cơ sở dữ liệu
+        return orderStateRepository.save(newOrderState);
     }
 }
