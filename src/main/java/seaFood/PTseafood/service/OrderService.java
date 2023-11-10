@@ -4,15 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import seaFood.PTseafood.dto.OrderRequest;
-import seaFood.PTseafood.entity.Order;
-import seaFood.PTseafood.entity.OrderState;
-import seaFood.PTseafood.entity.User;
+import seaFood.PTseafood.entity.*;
 import seaFood.PTseafood.exception.ResourceNotFoundException;
 import seaFood.PTseafood.repository.IOrderRepository;
 import seaFood.PTseafood.repository.IOrderStateRepository;
 import seaFood.PTseafood.utils.GenerateCodeUtil;
 import seaFood.PTseafood.common.Enum;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -25,9 +24,14 @@ public class OrderService {
     private  CartService cartService;
     @Autowired
     private IOrderStateRepository orderStateRepository;
+    @Autowired
+    private ProductVariantService productVariantService;
 
     @Autowired
     private OrderDetailService orderDetailService;
+
+    @Autowired
+    private UserService userService;
     ///Admin page
     public List<Order> getAll(){return orderRepository.findAll();}
     //Search by customer
@@ -62,10 +66,13 @@ public class OrderService {
             // lưu discount ở user là số nguyên vd : 10 thì 10/100 -->> 10%
             int discountRate = user.getDiscountRate();
             System.out.println("Discount Rate: " + discountRate);
-            int discountPrice = discountRate / 100;
+            double discountPrice = discountRate / 100.0;
+            System.out.println(discountPrice);
             double finalPrice = totalPrice*(1-discountPrice);
+            System.out.println(finalPrice);
             // làm tròn
             finalPrice = Math.round(finalPrice);
+            System.out.println(finalPrice);
         if ("momo".equalsIgnoreCase(payment)) {
             // Xử lý thanh toán qua Momo
 
@@ -90,8 +97,8 @@ public class OrderService {
         orderState.setOrder(order);
         orderStateRepository.save(orderState);
 
-//        orderDetailService.create(order,user);
-
+        orderDetailService.create(order,user);
+        cartService.clearCart(user);
 
         return order;
     }
@@ -113,7 +120,9 @@ public class OrderService {
         if (newOrderState.getState().equals( Enum.OrderStatus.SHIPPING.getName())) {
             // Cập nhật trạng thái đơn hàng
             newOrderState.setState(Enum.OrderStatus.COMPLETED.getName());
-
+            // Cập nhật totalUserPurchase cho người dùng
+            BigInteger purchaseAmount = BigInteger.valueOf(existingOrder.getFinalPrice().longValue()); // Chuyển đổi từ double sang BigInteger
+            userService.updateTotalUserPurchase(user, purchaseAmount);
             // Lưu cập nhật vào cơ sở dữ liệu
             return orderStateRepository.save(newOrderState);
         } else {
@@ -124,15 +133,44 @@ public class OrderService {
     //update State by admin
     @PreAuthorize("hasRole('Admin')")
     public OrderState updateOrderStateByAdmin(Long orderId) {
-        // Kiểm tra xem đơn hàng có tồn tại không
         Order existingOrder = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đơn hàng với ID: " + orderId));
 
         OrderState newOrderState = orderStateRepository.findByOrder(existingOrder);
+
+        // Xác nhận đơn hàng đã ở trạng thái SHIPPING
+//        if (!newOrderState.getState().equals(Enum.OrderStatus.SHIPPING.getName())) {
+//            throw new RuntimeException("Không thể cập nhật trạng thái đơn hàng nếu không ở trạng thái SHIPPING");
+//        }
+
+        // Lấy danh sách các mục đơn hàng
+        List<OrderDetail> orderItems = existingOrder.getOrderDetails();
+
+        // Cập nhật số lượng tồn kho cho từng sản phẩm trong đơn hàng
+        for (OrderDetail orderItem : orderItems) {
+            ProductVariant productVariant = orderItem.getProductVariant();
+            int quantity = orderItem.getQuantity();
+
+            // Cập nhật số lượng tồn kho
+            int newStock = productVariant.getStock() - quantity;
+            productVariant.setStock(newStock);
+            productVariant.setSoldQuantity(quantity);
+            productVariantService.save(productVariant);
+        }
+
         // Cập nhật trạng thái đơn hàng
         newOrderState.setUpdateAt(LocalDateTime.now());
         newOrderState.setState(Enum.OrderStatus.SHIPPING.getName());
+
         // Lưu cập nhật vào cơ sở dữ liệu
         return orderStateRepository.save(newOrderState);
+    }
+    //Get all order by user
+    public List<Order> getAllByUser(User user){
+        List<Order> orderByUser = orderRepository.findByUser(user);
+//        if(orderByUser.isEmpty()){
+//            throw new ResourceNotFoundException("User này không có đơn hàng!");
+//        }
+        return orderByUser;
     }
 }

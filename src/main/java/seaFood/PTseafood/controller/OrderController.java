@@ -14,6 +14,8 @@ import seaFood.PTseafood.utils.JwtUtil;
 import seaFood.PTseafood.utils.PhoneNumberValidator;
 import seaFood.PTseafood.exception.ResourceNotFoundException;
 
+import java.util.List;
+
 import static seaFood.PTseafood.utils.PhoneNumberValidator.validateVNPhoneNumber;
 
 @CrossOrigin
@@ -29,10 +31,11 @@ public class OrderController {
     public ResponseEntity<?> createOrder(@RequestBody OrderRequest orderRequest, HttpServletRequest request) {
         try {
             User user = jwtUtill.getUserFromToken(request);
-            Order order = orderService.create(orderRequest, user);
+
             if(PhoneNumberValidator.validateVNPhoneNumber(orderRequest.getReceiverPhone()) == false){
                 return ResponseEntity.badRequest().body("Số điện thoại không hợp lệ");
             }
+            Order order = orderService.create(orderRequest, user);
             return ResponseEntity.ok(order);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -47,6 +50,22 @@ public class OrderController {
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    @GetMapping("/user")
+    public ResponseEntity<?> getAllOrdersByUser(HttpServletRequest request) {
+        try {
+            User user = jwtUtill.getUserFromToken(request);
+            List<Order> orders = orderService.getAllByUser(user);
+            // Kiểm tra nếu danh sách đơn hàng rỗng
+            if (orders.isEmpty()) {
+                return ResponseEntity.badRequest().body("Người dùng này không có đơn hàng!");
+            }
+            // Trả về danh sách đơn hàng
+            return ResponseEntity.ok(orders);
+        } catch (ResourceNotFoundException e) {
+            // Xử lý nếu không tìm thấy người dùng
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

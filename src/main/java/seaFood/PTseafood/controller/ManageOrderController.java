@@ -3,9 +3,12 @@ package seaFood.PTseafood.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import seaFood.PTseafood.entity.Order;
 import seaFood.PTseafood.service.OrderService;
 import seaFood.PTseafood.entity.OrderState;
 import seaFood.PTseafood.exception.ResourceNotFoundException;
+
+import java.util.List;
 
 @CrossOrigin
 @RestController
@@ -21,5 +24,13 @@ public class ManageOrderController {
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+    @GetMapping
+    public ResponseEntity<?> getAll(){
+        List<Order> orders = orderService.getAll();
+        if(orders.isEmpty()){
+            return ResponseEntity.badRequest().body("hiện tại chưa có đơn hàng nào!");
+        }
+        return ResponseEntity.ok(orders);
     }
 }
