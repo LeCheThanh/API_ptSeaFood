@@ -139,5 +139,19 @@ public class UserService {
         }else throw new ResourceNotFoundException("User not found");
     }
 
+    //thay đổi đều được thực hiện, có lỗi xảy ra ở đâu đó thì sẽ dừng phương thức
+    @Transactional
+    public void updateTotalUserPurchase(User user, BigInteger  purchaseAmount) {
+        // Lấy thông tin người dùng từ cơ sở dữ liệu
+        User existingUser = userRepository.findById(user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy người dùng với ID: " + user.getId()));
+
+        // Cập nhật giá trị total_user_purchase
+        existingUser.setTotalPurchaseAmount(existingUser.getTotalPurchaseAmount().add(purchaseAmount));
+
+        // Lưu cập nhật vào cơ sở dữ liệu
+        userRepository.save(existingUser);
+    }
+
 }
 
