@@ -1,7 +1,9 @@
 package seaFood.PTseafood.controller;
 
+import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import seaFood.PTseafood.entity.Favorite;
 import seaFood.PTseafood.entity.Product;
