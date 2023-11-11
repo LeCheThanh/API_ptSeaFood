@@ -35,8 +35,8 @@ public class ManageUserController {
 //        return ResponseEntity.ok("Thành công");
 //    }
 
-//    @Scheduled(cron = "* * * * * ?")// mỗi giây/test
-    @Scheduled(cron = "0 0 0 * * ?") // Lên lịch chạy mỗi ngày vào lúc 00:00:00
+    @Scheduled(cron = "* * * * * ?")// mỗi giây/test
+//    @Scheduled(cron = "0 0 0 * * ?") // Lên lịch chạy mỗi ngày vào lúc 00:00:00
     public void updateRanks() {
         System.out.println("Scheduled task is running.");
         userService.updateRankForUsers();
