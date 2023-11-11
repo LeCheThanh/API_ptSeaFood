@@ -155,12 +155,11 @@ public class CartService {
             double totalPrice = price * quantity;
             cartItem.setUser(user);
             cartItem.setTotal(totalPrice);
-
             return cartRepository.save(cartItem);
         }
     }
 
-    //        //////////
+    ////////////
     public List<CartItem> getCartItemsByUser(User user) {
         return cartRepository.findAllByUser(user);
     }
@@ -237,26 +236,40 @@ public class CartService {
         }
     }
     // tự động xóa theo stock
-    public void autoDelProOutOfStock() {
+    public String autoDelProOutOfStock() {
         //hàng tồn về 0
         List<CartItem> itemsToRemove = cartRepository.findByProductVariantStockLessThan(1);
-
-        for (CartItem item : itemsToRemove) {
-            // Xóa sản phẩm khỏi giỏ hàng
-            cartRepository.delete(item);
+        String message = "";
+        if(!itemsToRemove.isEmpty()) {
+            for (CartItem item : itemsToRemove) {
+                // Xóa sản phẩm khỏi giỏ hàng
+                message = notifyUserOutOfStock(item.getProductVariant().getName());
+            }
         }
 
         /// khi số lượng sản phẩm trong giỏ hàng > hơn số hàng tồn
-        List<CartItem> itemsWithStockExceeded = cartRepository.findItemsWithStockExceeded();
 
-        for (CartItem item : itemsWithStockExceeded) {
-            // Xóa sản phẩm khỏi giỏ hàng
-            cartRepository.delete(item);
+        List<CartItem> itemsWithStockExceeded = cartRepository.findItemsWithStockExceeded();
+        if(!itemsWithStockExceeded.isEmpty()) {
+            for (CartItem item : itemsWithStockExceeded) {
+                // Xóa sản phẩm khỏi giỏ hàng
+                message = notifyUserStockExceeded(item.getProductVariant().getName());
+            }
         }
+        return message;
     }
     //check cart
     public boolean isCartEmpty(User user) {
         List<CartItem> cartItems = cartRepository.findByUser(user);
         return cartItems.isEmpty();
+    }
+    private String notifyUserOutOfStock(String productVariantName) {
+        // Thực hiện xử lý thông báo cho trường hợp hết hàng
+        return("Sản phẩm "+productVariantName+" đã hết hàng");
+    }
+
+    private String notifyUserStockExceeded(String productVariantName) {
+        // Thực hiện xử lý thông báo cho trường hợp số lượng trong giỏ hàng vượt quá số lượng tồn kho
+        return ("Số lượng sản phẩm " + productVariantName + " trong giỏ hàng vượt quá số lượng tồn kho.");
     }
 }

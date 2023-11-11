@@ -70,9 +70,14 @@ public class CartController {
         }
     }
 
-    @Scheduled(fixedRate = 1000) // Cứ mỗi gây
-    public void updateCartsJob() {
-        cartService.autoDelProOutOfStock();
+    @GetMapping("/auto-carts")
+//    @Scheduled(fixedRate = 1000) // Cứ mỗi gây
+    public ResponseEntity<?> updateCartsJob() {
+        String mesage = cartService.autoDelProOutOfStock();
+        if(mesage.isEmpty()){
+            return ResponseEntity.ok("Ok");
+        }
+        return ResponseEntity.badRequest().body(mesage);
     }
 
     @PutMapping("/update")
