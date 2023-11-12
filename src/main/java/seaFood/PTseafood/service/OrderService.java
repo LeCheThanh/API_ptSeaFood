@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import seaFood.PTseafood.dto.OrderRequest;
+import seaFood.PTseafood.dto.VnPayRequest;
 import seaFood.PTseafood.entity.*;
 import seaFood.PTseafood.exception.ResourceNotFoundException;
 import seaFood.PTseafood.repository.IOrderRepository;
@@ -31,6 +32,9 @@ public class OrderService {
     private OrderDetailService orderDetailService;
 
     @Autowired
+    private VnPayService vnPayService;
+
+    @Autowired
     private UserService userService;
     ///Admin page
     public List<Order> getAll(){return orderRepository.findAll();}
@@ -38,7 +42,7 @@ public class OrderService {
     public Order getByCode(String code){return orderRepository.findByCode(code);}
 
     //Create new Order
-    public Order create(OrderRequest orderRequest, User user) throws Exception {
+    public Order process(OrderRequest orderRequest, User user) throws Exception {
 
             String name = orderRequest.getReceiverName();
             String phone = orderRequest.getReceiverPhone();
@@ -51,7 +55,6 @@ public class OrderService {
             }
             Order order = new Order();
             order.setCreatedAt(LocalDateTime.now());
-            order.setCode(GenerateCodeUtil.GenerateCodeOrder());
             order.setNote(note);
 
             order.setUser(user);
@@ -61,6 +64,7 @@ public class OrderService {
             order.setReceiverAddress(address != null ? address : user.getAddress());
             order.setDiscountPrice(user.getDiscountRate());
             order.setTotalPrice(cartService.getTotalCartValue(user));
+            order.setCode(GenerateCodeUtil.GenerateCodeOrder());
 
             double totalPrice = cartService.getTotalCartValue(user);
             // lưu discount ở user là số nguyên vd : 10 thì 10/100 -->> 10%
@@ -73,34 +77,34 @@ public class OrderService {
             // làm tròn
             finalPrice = Math.round(finalPrice);
             System.out.println(finalPrice);
-        if ("momo".equalsIgnoreCase(payment)) {
-            // Xử lý thanh toán qua Momo
 
-            // Làm tròn giá trị cuối cùng
-            finalPrice = Math.round(finalPrice);
-        } else if ("vnpay".equalsIgnoreCase(payment)) {
 
-        } else if ("cash".equalsIgnoreCase(payment)) {
+            order.setFinalPrice(finalPrice);
+            order.setPaymentMethod(payment);
+            order.setPaymentStatus(Enum.PaymentStatus.UNPAID.getName());
+            orderRepository.save(order);
 
-        }
+            if(payment.equals("cash")){
+                saveOrder(order,user);
+            }if(payment.equals("vnpay")){
+                vnPayService.paymentVnPay(finalPrice,user,order.getCode());
+            }
 
-        order.setFinalPrice(finalPrice);
-        order.setPaymentMethod(payment);
-        order.setPaymentStatus(Enum.PaymentStatus.UNPAID.getName());
+            return order;
+    }
 
-        orderRepository.save(order);
-
+    public String saveOrder(Order order, User user){
+        Order newOrder = orderRepository.save(order);
+        orderDetailService.create(order,user);
         OrderState orderState = new OrderState();
         orderState.setCreatedAt(LocalDateTime.now());
         orderState.setUpdateAt(LocalDateTime.now());
         orderState.setState(Enum.OrderStatus.PENDING_CONFIRMATION.getName());
         orderState.setOrder(order);
         orderStateRepository.save(orderState);
-
-        orderDetailService.create(order,user);
+        updateStock(order);
         cartService.clearCart(user);
-
-        return order;
+        return "Thanh toán đã được xử lý. Mã đơn hàng của bạn là: " + newOrder.getCode();
     }
 
     //update State by user
@@ -129,6 +133,21 @@ public class OrderService {
             throw new RuntimeException("Không thể cập nhật trạng thái đơn hàng ở trạng thái hiện tại");
         }
     }
+    //Cập nhật số lượng stock
+    public void updateStock(Order order){
+        List<OrderDetail> orderItems = order.getOrderDetails();
+        for (OrderDetail orderItem : orderItems) {
+            ProductVariant productVariant = orderItem.getProductVariant();
+            int quantity = orderItem.getQuantity();
+
+            // Cập nhật số lượng tồn kho
+            int newStock = productVariant.getStock() - quantity;
+            productVariant.setStock(newStock);
+            productVariant.setSoldQuantity(quantity);
+            productVariantService.save(productVariant);
+       }
+
+    }
 
     //update State by admin
     @PreAuthorize("hasRole('Admin')")
@@ -144,20 +163,19 @@ public class OrderService {
 //        }
 
         // Lấy danh sách các mục đơn hàng
-        List<OrderDetail> orderItems = existingOrder.getOrderDetails();
-
-        // Cập nhật số lượng tồn kho cho từng sản phẩm trong đơn hàng
-        for (OrderDetail orderItem : orderItems) {
-            ProductVariant productVariant = orderItem.getProductVariant();
-            int quantity = orderItem.getQuantity();
-
-            // Cập nhật số lượng tồn kho
-            int newStock = productVariant.getStock() - quantity;
-            productVariant.setStock(newStock);
-            productVariant.setSoldQuantity(quantity);
-            productVariantService.save(productVariant);
-        }
-
+//        List<OrderDetail> orderItems = existingOrder.getOrderDetails();
+//
+//        // Cập nhật số lượng tồn kho cho từng sản phẩm trong đơn hàng
+//        for (OrderDetail orderItem : orderItems) {
+//            ProductVariant productVariant = orderItem.getProductVariant();
+//            int quantity = orderItem.getQuantity();
+//
+//            // Cập nhật số lượng tồn kho
+//            int newStock = productVariant.getStock() - quantity;
+//            productVariant.setStock(newStock);
+//            productVariant.setSoldQuantity(quantity);
+//            productVariantService.save(productVariant);
+//        }
         // Cập nhật trạng thái đơn hàng
         newOrderState.setUpdateAt(LocalDateTime.now());
         newOrderState.setState(Enum.OrderStatus.SHIPPING.getName());
@@ -173,4 +191,5 @@ public class OrderService {
 //        }
         return orderByUser;
     }
+
 }
