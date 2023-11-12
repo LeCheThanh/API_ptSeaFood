@@ -13,7 +13,7 @@ import java.util.*;
 
 @Service
 public class VnPayService {
-    public VnPayResponse paymentVnPay(double finalPrice, User user) throws UnsupportedEncodingException {
+    public VnPayResponse paymentVnPay(double finalPrice, User user, String  code) throws UnsupportedEncodingException {
         long amount = Math.round(finalPrice)*100;
         String bankCode = "NCB";
 
@@ -21,6 +21,7 @@ public class VnPayService {
         String vnp_TmnCode = VnPayConfig.vnp_TmnCode;
         String vnp_IpAddr = "127.0.0.1";
         String orderType = "other";
+//        String orderCode = code;
 
         Map<String, String> vnp_Params = new HashMap<>();
         vnp_Params.put("vnp_Version", VnPayConfig.vnp_Version);
@@ -32,11 +33,12 @@ public class VnPayService {
         vnp_Params.put("vnp_Locale", "vn");
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
         vnp_Params.put("vnp_OrderType", orderType);
+//        vnp_Params.put("vnp_orderCode", code);
 
 
         vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
         vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang:" + vnp_TxnRef);
-        vnp_Params.put("vnp_ReturnUrl", VnPayConfig.vnp_ReturnUrl);
+        vnp_Params.put("vnp_ReturnUrl", VnPayConfig.vnp_ReturnUrl+"?orderCode="+code);
 
 
         Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
