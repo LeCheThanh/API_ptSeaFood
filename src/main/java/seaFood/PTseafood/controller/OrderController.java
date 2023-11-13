@@ -36,8 +36,10 @@ public class OrderController {
     public ResponseEntity<?> createOrder(@RequestBody OrderRequest orderRequest, HttpServletRequest request) {
         try {
             User user = jwtUtil.getUserFromToken(request);
-            if(EmailValidator.validateEmail(orderRequest.getReceiverEmail())==false){
-                return ResponseEntity.badRequest().body("Email không hợp lệ");
+            if(orderRequest.getReceiverEmail() != null){
+                if(EmailValidator.validateEmail(orderRequest.getReceiverEmail())==false){
+                    return ResponseEntity.badRequest().body("Email không hợp lệ");
+                }
             }
             if(PhoneNumberValidator.validateVNPhoneNumber(orderRequest.getReceiverPhone()) == false){
                 return ResponseEntity.badRequest().body("Số điện thoại không hợp lệ");

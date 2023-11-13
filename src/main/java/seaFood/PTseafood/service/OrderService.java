@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import seaFood.PTseafood.dto.OrderRequest;
-import seaFood.PTseafood.dto.VnPayRequest;
 import seaFood.PTseafood.entity.*;
 import seaFood.PTseafood.exception.ResourceNotFoundException;
 import seaFood.PTseafood.repository.IOrderRepository;
@@ -124,6 +123,8 @@ public class OrderService {
         if (newOrderState.getState().equals( Enum.OrderStatus.SHIPPING.getName())) {
             // Cập nhật trạng thái đơn hàng
             newOrderState.setState(Enum.OrderStatus.COMPLETED.getName());
+            //Cập nhật payment status
+            existingOrder.setPaymentStatus(Enum.PaymentStatus.PAID.getName());
             // Cập nhật totalUserPurchase cho người dùng
             BigInteger purchaseAmount = BigInteger.valueOf(existingOrder.getFinalPrice().longValue()); // Chuyển đổi từ double sang BigInteger
             userService.updateTotalUserPurchase(user, purchaseAmount);
@@ -133,6 +134,22 @@ public class OrderService {
             throw new RuntimeException("Không thể cập nhật trạng thái đơn hàng ở trạng thái hiện tại");
         }
     }
+    //update State by admin
+    @PreAuthorize("hasRole('Admin')")
+    public OrderState updateOrderStateByAdmin(Long orderId) {
+        Order existingOrder = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đơn hàng với ID: " + orderId));
+
+        OrderState newOrderState = orderStateRepository.findByOrder(existingOrder);
+
+        // Cập nhật trạng thái đơn hàng
+        newOrderState.setUpdateAt(LocalDateTime.now());
+        newOrderState.setState(Enum.OrderStatus.SHIPPING.getName());
+
+        // Lưu cập nhật vào cơ sở dữ liệu
+        return orderStateRepository.save(newOrderState);
+    }
+
     //Cập nhật số lượng stock
     public void updateStock(Order order){
         List<OrderDetail> orderItems = order.getOrderDetails();
@@ -143,45 +160,13 @@ public class OrderService {
             // Cập nhật số lượng tồn kho
             int newStock = productVariant.getStock() - quantity;
             productVariant.setStock(newStock);
-            productVariant.setSoldQuantity(quantity);
+
+            int newSoldQuantity = productVariant.getSoldQuantity() + quantity;
+            productVariant.setSoldQuantity(newSoldQuantity);
+
             productVariantService.save(productVariant);
-       }
+        }
 
-    }
-
-    //update State by admin
-    @PreAuthorize("hasRole('Admin')")
-    public OrderState updateOrderStateByAdmin(Long orderId) {
-        Order existingOrder = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đơn hàng với ID: " + orderId));
-
-        OrderState newOrderState = orderStateRepository.findByOrder(existingOrder);
-
-        // Xác nhận đơn hàng đã ở trạng thái SHIPPING
-//        if (!newOrderState.getState().equals(Enum.OrderStatus.SHIPPING.getName())) {
-//            throw new RuntimeException("Không thể cập nhật trạng thái đơn hàng nếu không ở trạng thái SHIPPING");
-//        }
-
-        // Lấy danh sách các mục đơn hàng
-//        List<OrderDetail> orderItems = existingOrder.getOrderDetails();
-//
-//        // Cập nhật số lượng tồn kho cho từng sản phẩm trong đơn hàng
-//        for (OrderDetail orderItem : orderItems) {
-//            ProductVariant productVariant = orderItem.getProductVariant();
-//            int quantity = orderItem.getQuantity();
-//
-//            // Cập nhật số lượng tồn kho
-//            int newStock = productVariant.getStock() - quantity;
-//            productVariant.setStock(newStock);
-//            productVariant.setSoldQuantity(quantity);
-//            productVariantService.save(productVariant);
-//        }
-        // Cập nhật trạng thái đơn hàng
-        newOrderState.setUpdateAt(LocalDateTime.now());
-        newOrderState.setState(Enum.OrderStatus.SHIPPING.getName());
-
-        // Lưu cập nhật vào cơ sở dữ liệu
-        return orderStateRepository.save(newOrderState);
     }
     //Get all order by user
     public List<Order> getAllByUser(User user){
