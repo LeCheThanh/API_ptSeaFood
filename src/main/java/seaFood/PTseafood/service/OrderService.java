@@ -34,6 +34,9 @@ public class OrderService {
     private VnPayService vnPayService;
 
     @Autowired
+    private MomoService momoService;
+
+    @Autowired
     private UserService userService;
     ///Admin page
     public List<Order> getAll(){return orderRepository.findAll();}
@@ -87,6 +90,8 @@ public class OrderService {
                 saveOrder(order,user);
             }if(payment.equals("vnpay")){
                 vnPayService.paymentVnPay(finalPrice,user,order.getCode());
+            }if(payment.equals("momo")){
+                momoService.paymentMomo(finalPrice, user, order.getCode());
             }
 
             return order;
@@ -175,6 +180,18 @@ public class OrderService {
 //            throw new ResourceNotFoundException("User này không có đơn hàng!");
 //        }
         return orderByUser;
+    }
+    ///Thong ke
+    public double getTotalSales() {
+        return orderRepository.getTotalSales();
+    }
+
+    public double getMonthlySales(int year, int month) {
+        return orderRepository.getMonthlySales(year, month);
+    }
+
+    public double getYearlySales(int year) {
+        return orderRepository.getYearlySales(year);
     }
 
 }

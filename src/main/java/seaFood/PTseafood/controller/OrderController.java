@@ -5,10 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import seaFood.PTseafood.common.Enum;
+import seaFood.PTseafood.dto.MomoResponse;
 import seaFood.PTseafood.dto.OrderRequest;
 import seaFood.PTseafood.entity.Order;
 import seaFood.PTseafood.entity.User;
 import seaFood.PTseafood.entity.OrderState;
+import seaFood.PTseafood.service.MomoService;
 import seaFood.PTseafood.service.OrderService;
 import seaFood.PTseafood.service.VnPayService;
 import seaFood.PTseafood.utils.EmailValidator;
@@ -29,6 +31,9 @@ public class OrderController {
     @Autowired
     private VnPayService vnPayService;
 
+    @Autowired
+    private MomoService momoService;
+
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -36,21 +41,38 @@ public class OrderController {
     public ResponseEntity<?> createOrder(@RequestBody OrderRequest orderRequest, HttpServletRequest request) {
         try {
             User user = jwtUtil.getUserFromToken(request);
+            Order order = orderService.process(orderRequest, user);
+
+            if(orderRequest.getReceiverEmail()==null && user.getEmail()==null){
+                return ResponseEntity.badRequest().body("Email không được để trống");
+            }
+            if(orderRequest.getReceiverPhone()==null && user.getPhone()==null){
+                return ResponseEntity.badRequest().body("SĐT không được để trống");
+            }
+            if(orderRequest.getReceiverName()==null && user.getFullName() == null){
+                return ResponseEntity.badRequest().body("Tên người nhận không được để trống");
+            }
+
             if(orderRequest.getReceiverEmail() != null){
                 if(EmailValidator.validateEmail(orderRequest.getReceiverEmail())==false){
                     return ResponseEntity.badRequest().body("Email không hợp lệ");
                 }
             }
-            if(PhoneNumberValidator.validateVNPhoneNumber(orderRequest.getReceiverPhone()) == false){
-                return ResponseEntity.badRequest().body("Số điện thoại không hợp lệ");
+            if(orderRequest.getReceiverPhone()!=null){
+                if(PhoneNumberValidator.validateVNPhoneNumber(orderRequest.getReceiverPhone()) == false){
+                    return ResponseEntity.badRequest().body("Số điện thoại không hợp lệ");
+                }
             }
             if(!orderRequest.getPayment().equals("momo")&&!orderRequest.getPayment().equals("cash")&&!orderRequest.getPayment().equals("vnpay")){
                 return ResponseEntity.badRequest().body("Phương thức thanh toán không hợp lệ");
             }
-            Order order = orderService.process(orderRequest, user);
             if("vnpay".equalsIgnoreCase(orderRequest.getPayment())){
                     VnPayResponse vnPayResponse = vnPayService.paymentVnPay(order.getFinalPrice(), user,order.getCode());
                 return ResponseEntity.ok(vnPayResponse.getURL());
+            }
+            if("momo".equalsIgnoreCase(orderRequest.getPayment())){
+                MomoResponse momoResponse = momoService.paymentMomo(order.getFinalPrice(), user,order.getCode());
+                return ResponseEntity.ok(momoResponse.getPayUrl());
             }
             return ResponseEntity.ok(order);
         } catch (Exception e) {
