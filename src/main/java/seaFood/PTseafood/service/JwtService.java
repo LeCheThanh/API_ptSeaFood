@@ -21,7 +21,7 @@ public class JwtService {
         Algorithm algorithm = Algorithm.HMAC256(Secret_key.getBytes());
         return JWT.create()
                 .withSubject(user.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() +30*60 * 1000))
+                .withExpiresAt(new Date(System.currentTimeMillis() +1000 * 60 * 1000))
                 .withClaim("roles",authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
                 .sign(algorithm);
     }
