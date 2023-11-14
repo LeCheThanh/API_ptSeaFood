@@ -130,6 +130,9 @@ public class CartService {
 
         if (existingCartItem != null) {
             // Nếu sản phẩm đã có trong giỏ hàng, thì tăng số lượng (quantity) lên
+            if(existingCartItem.getQuantity() + quantity > productVariant.getStock()){
+                throw new ResourceNotFoundException("Số lượng sản phẩm chỉ còn lại " + productVariant.getStock());
+            }
             existingCartItem.setQuantity(existingCartItem.getQuantity() + quantity);
 
             // Sử dụng giá sỉ nếu user có giá sỉ và giá sỉ có giá trị
