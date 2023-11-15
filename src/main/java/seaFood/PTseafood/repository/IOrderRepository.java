@@ -16,13 +16,13 @@ public interface IOrderRepository  extends JpaRepository<Order,Long> {
 
     List<Order> findByUser(User user);
 
-    @Query("SELECT COALESCE(SUM(o.finalPrice), 0) FROM Order o WHERE o.paymentStatus = 'PAID'")
+    @Query("SELECT COALESCE(SUM(o.finalPrice), 0) FROM Order o WHERE o.paymentStatus = 'Đã thanh toán'")
     double getTotalSales();
 
-    @Query("SELECT COALESCE(SUM(o.finalPrice), 0) FROM Order o WHERE o.paymentStatus = 'PAID' AND YEAR(o.createdAt) = :year AND MONTH(o.createdAt) = :month")
+    @Query("SELECT COALESCE(SUM(o.finalPrice), 0) FROM Order o WHERE o.paymentStatus = 'Đã thanh toán' AND YEAR(o.createdAt) = :year AND MONTH(o.createdAt) = :month")
     double getMonthlySales( int year, int month);
 
-    @Query("SELECT COALESCE(SUM(o.finalPrice), 0) FROM Order o WHERE o.paymentStatus = 'PAID' AND YEAR(o.createdAt) = :year")
+    @Query("SELECT COALESCE(SUM(o.finalPrice), 0) FROM Order o WHERE o.paymentStatus = 'Đã thanh toán' AND YEAR(o.createdAt) = :year")
     double getYearlySales(int year);
 
 }

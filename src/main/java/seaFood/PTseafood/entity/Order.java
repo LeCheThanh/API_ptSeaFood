@@ -69,4 +69,8 @@ public class Order {
     @JsonIgnore
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<VnPayTransaction> vnPayTransactions = new ArrayList<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private List<MomoTransaction> momoTransactions = new ArrayList<>();
  }

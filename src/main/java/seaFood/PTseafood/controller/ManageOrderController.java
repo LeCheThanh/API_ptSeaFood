@@ -33,4 +33,21 @@ public class ManageOrderController {
         }
         return ResponseEntity.ok(orders);
     }
+    @GetMapping("/total-sales")
+    public ResponseEntity<Double> getTotalSales() {
+        double totalSales = orderService.getTotalSales();
+        return ResponseEntity.ok(totalSales);
+    }
+
+    @GetMapping("/monthly-sales")
+    public ResponseEntity<Double> getMonthlySales(@RequestParam int year, @RequestParam int month) {
+        double monthlySales = orderService.getMonthlySales(year, month);
+        return ResponseEntity.ok(monthlySales);
+    }
+
+    @GetMapping("/yearly-sales")
+    public ResponseEntity<Double> getYearlySales(@RequestParam int year) {
+        double yearlySales = orderService.getYearlySales(year);
+        return ResponseEntity.ok(yearlySales);
+    }
 }

@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import seaFood.PTseafood.dto.ProductProductVariantRequest;
+import seaFood.PTseafood.dto.ProductStatistic;
 import seaFood.PTseafood.dto.ProductVariantRequest;
 import seaFood.PTseafood.entity.Product;
 import seaFood.PTseafood.entity.ProductVariant;
@@ -146,6 +147,10 @@ public class ManageProductController {
                 .collect(Collectors.toList());
 
         return searchResults;
+    }
+    @GetMapping("/statistics")
+    public List<ProductStatistic> getProductStatistics() {
+        return productVariantService.getProductStatistics();
     }
 
 }
