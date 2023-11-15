@@ -2,15 +2,12 @@ package seaFood.PTseafood.service;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import seaFood.PTseafood.config.MomoConfig;
 import seaFood.PTseafood.dto.MomoRequest;
 import seaFood.PTseafood.dto.MomoResponse;
-import seaFood.PTseafood.entity.Order;
 import seaFood.PTseafood.entity.User;
 import seaFood.PTseafood.repository.IOrderRepository;
 

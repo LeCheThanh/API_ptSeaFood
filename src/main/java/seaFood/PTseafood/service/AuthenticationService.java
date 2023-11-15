@@ -1,23 +1,18 @@
 package seaFood.PTseafood.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import seaFood.PTseafood.auth.AuthenticationReponse;
 import seaFood.PTseafood.auth.AuthenticationRequest;
 import seaFood.PTseafood.entity.Role;
 import seaFood.PTseafood.entity.User;
-import seaFood.PTseafood.exception.ResourceNotFoundException;
 import seaFood.PTseafood.repository.IRoleCustomRepository;
 import seaFood.PTseafood.repository.IUserRepository;
-import seaFood.PTseafood.utils.JwtUtil;
 
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 
 @Service
 @RequiredArgsConstructor

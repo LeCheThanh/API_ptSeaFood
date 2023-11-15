@@ -3,14 +3,12 @@ package seaFood.PTseafood.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 import seaFood.PTseafood.dto.CartItemRequest;
 import seaFood.PTseafood.dto.UpdateCartRequest;
 import seaFood.PTseafood.entity.CartItem;
 import seaFood.PTseafood.entity.User;
 import seaFood.PTseafood.exception.ResourceNotFoundException;
-import seaFood.PTseafood.service.AuthenticationService;
 import seaFood.PTseafood.service.CartService;
 import seaFood.PTseafood.utils.JwtUtil;
 

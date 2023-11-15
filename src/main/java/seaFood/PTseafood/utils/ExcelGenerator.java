@@ -8,12 +8,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.aspectj.weaver.ast.Or;
-import org.springframework.beans.factory.annotation.Autowired;
 import seaFood.PTseafood.entity.Order;
 import seaFood.PTseafood.entity.OrderDetail;
-
-import seaFood.PTseafood.service.OrderService;
 
 import java.io.IOException;
 import java.util.List;

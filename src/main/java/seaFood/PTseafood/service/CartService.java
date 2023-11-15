@@ -1,12 +1,7 @@
 package seaFood.PTseafood.service;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.DigestUtils;
-import seaFood.PTseafood.auth.AuthenticationRequest;
-import seaFood.PTseafood.config.JwtAuthenticationFilter;
 import seaFood.PTseafood.dto.CartItemRequest;
 import seaFood.PTseafood.dto.UpdateCartRequest;
 import seaFood.PTseafood.entity.CartItem;
@@ -17,9 +12,7 @@ import seaFood.PTseafood.exception.ResourceNotFoundException;
 import seaFood.PTseafood.repository.ICartRepository;
 import seaFood.PTseafood.utils.JwtUtil;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class CartService {

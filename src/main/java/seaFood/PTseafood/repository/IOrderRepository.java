@@ -4,7 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import seaFood.PTseafood.entity.Order;
-import seaFood.PTseafood.entity.ProductVariant;
 import seaFood.PTseafood.entity.User;
 
 import java.util.List;

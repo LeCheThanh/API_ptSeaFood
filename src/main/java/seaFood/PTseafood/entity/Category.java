@@ -1,7 +1,6 @@
 package seaFood.PTseafood.entity;
 
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Data;
 import org.hibernate.annotations.ColumnDefault;
 

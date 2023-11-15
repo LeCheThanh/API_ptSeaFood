@@ -2,21 +2,15 @@ package seaFood.PTseafood.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.config.RepositoryNameSpaceHandler;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import seaFood.PTseafood.entity.Order;
-import seaFood.PTseafood.entity.OrderDetail;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import seaFood.PTseafood.service.ExcelService;
 import seaFood.PTseafood.service.OrderService;
-import seaFood.PTseafood.utils.ExcelGenerator;
 
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
 
 @CrossOrigin
 @RestController

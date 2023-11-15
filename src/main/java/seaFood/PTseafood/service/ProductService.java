@@ -7,12 +7,10 @@ import seaFood.PTseafood.entity.Product;
 import seaFood.PTseafood.exception.ResourceNotFoundException;
 import seaFood.PTseafood.repository.ICategoryRepository;
 import seaFood.PTseafood.repository.IProductRepository;
-import seaFood.PTseafood.utils.GenerateCodeUtil;
 import seaFood.PTseafood.utils.SlugUtil;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.logging.Logger;
 
 @Service
 public class ProductService {

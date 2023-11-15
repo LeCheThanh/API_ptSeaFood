@@ -10,9 +10,6 @@ import org.springframework.stereotype.Repository;
 import seaFood.PTseafood.entity.Role;
 import seaFood.PTseafood.entity.User;
 
-import javax.xml.transform.Transformer;
-import java.lang.annotation.Native;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Repository

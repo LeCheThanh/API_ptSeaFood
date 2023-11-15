@@ -1,7 +1,6 @@
 package seaFood.PTseafood.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import seaFood.PTseafood.entity.Role;
 
 public interface IRoleRepository extends JpaRepository<Role,Long> {

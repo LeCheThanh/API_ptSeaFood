@@ -1,20 +1,8 @@
 package seaFood.PTseafood;
 
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.security.ConditionalOnDefaultWebSecurity;
-import org.springframework.context.annotation.Bean;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import seaFood.PTseafood.entity.Role;
-import seaFood.PTseafood.entity.User;
-//import seaFood.PTseafood.service.UserService;
-
-import java.math.BigInteger;
-import java.util.HashSet;
 @SpringBootApplication
 @EnableScheduling
 public class PTseafoodApplication {
