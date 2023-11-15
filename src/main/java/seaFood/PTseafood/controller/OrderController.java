@@ -2,6 +2,7 @@ package seaFood.PTseafood.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import seaFood.PTseafood.dto.MomoResponse;
@@ -11,6 +12,7 @@ import seaFood.PTseafood.entity.Order;
 import seaFood.PTseafood.entity.OrderState;
 import seaFood.PTseafood.entity.User;
 import seaFood.PTseafood.exception.ResourceNotFoundException;
+import seaFood.PTseafood.service.MailService;
 import seaFood.PTseafood.service.MomoService;
 import seaFood.PTseafood.service.OrderService;
 import seaFood.PTseafood.service.VnPayService;
@@ -33,6 +35,8 @@ public class OrderController {
     @Autowired
     private MomoService momoService;
 
+    @Autowired
+    private MailService mailService;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -104,6 +108,18 @@ public class OrderController {
         } catch (ResourceNotFoundException e) {
             // Xử lý nếu không tìm thấy người dùng
             return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    @PostMapping("/send-confirmation")
+    public ResponseEntity<String> sendConfirmationEmail(HttpServletRequest request) {
+        try {
+            Order order = orderService.getByCode("16999660814225VGcG3");
+            User user = jwtUtil.getUserFromToken(request);
+            mailService.sendConfirmationEmail(order, user);
+            return ResponseEntity.ok("gui mail thanh cong!");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send confirmation email.");
         }
     }
 
