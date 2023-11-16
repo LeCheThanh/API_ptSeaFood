@@ -6,7 +6,7 @@ import seaFood.PTseafood.entity.VnPayTransaction;
 import seaFood.PTseafood.repository.IVnPayTransactionRepository;
 
 @Service
-public class VnPayTranService {
+public class    VnPayTranService {
     @Autowired
     private IVnPayTransactionRepository vnPayTransactionRepository;
 
