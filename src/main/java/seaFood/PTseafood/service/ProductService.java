@@ -25,6 +25,7 @@ public class ProductService {
     public List<Product> getAll() {
         return productRepository.findAll();
     }
+    public long countAll() {return productRepository.count();}
     public Product getById(Long id)
     {
         return productRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Product not exist with id:"+id));

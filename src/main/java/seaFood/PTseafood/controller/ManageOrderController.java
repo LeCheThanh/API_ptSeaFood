@@ -50,4 +50,9 @@ public class ManageOrderController {
         double yearlySales = orderService.getYearlySales(year);
         return ResponseEntity.ok(yearlySales);
     }
+    @GetMapping("/count")
+    public ResponseEntity<?> count(){
+        Long all = orderService.countAll();
+        return ResponseEntity.ok(all);
+    }
 }

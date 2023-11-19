@@ -37,33 +37,28 @@ public class JwtUtil {
     }
 
     public User getUserFromToken(HttpServletRequest request) {
-
-//            Algorithm algorithm = Algorithm.HMAC256(Secret_key.getBytes());
-//            JWTVerifier verifier = JWT.require(algorithm).build();
-//            DecodedJWT decodedJWT = verifier.verify(token);
-//            String username = decodedJWT.getSubject();
-//
-//            // Lấy thông tin người dùng từ token và trả về
-//            Optional<User> user = userService.getByEmail(username);
-//            User userEx = user.get();
-//            return userEx;
-            String authorizationHeader = request.getHeader("Authorization");
-            if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-                try {
-                    String token = authorizationHeader.substring("Bearer ".length());
-                    // Giải mã token và trích xuất thông tin người dùng
-                    // Ví dụ: Sử dụng thư viện JWT để giải mã token
-                    DecodedJWT decodedJWT = JWT.decode(token);
-                    String username = decodedJWT.getSubject();
-                    List<String> roles = decodedJWT.getClaim("roles").asList(String.class);
-                    Optional<User> checkUser = userService.getByEmail(username);
-                    User user = checkUser.get();
-                    return user;
-                } catch (Exception ex) {
-                    // Xử lý lỗi nếu cần
-                }
+        String authorizationHeader = request.getHeader("Authorization");
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            try {
+                String token = authorizationHeader.substring("Bearer ".length());
+                // Giải mã token và trích xuất thông tin người dùng
+                // Ví dụ: Sử dụng thư viện JWT để giải mã token
+                DecodedJWT decodedJWT = JWT.decode(token);
+                String username = decodedJWT.getSubject();
+                List<String> roles = decodedJWT.getClaim("roles").asList(String.class);
+                Optional<User> checkUser = userService.getByEmail(username);
+                User user = checkUser.get();
+                return user;
+            } catch (Exception ex) {
+                // Xử lý lỗi nếu cần
             }
-            return null;
         }
+        return null;
     }
 
+    public List<String> getRoleFromToken(String token) {
+        DecodedJWT decodedJWT = JWT.decode(token);
+        List<String> roles = decodedJWT.getClaim("roles").asList(String.class);
+        return roles;
+    }
+}

@@ -151,4 +151,10 @@ public class ManageProductController {
         return productVariantService.getProductStatistics();
     }
 
+    @GetMapping("product/count")
+    public ResponseEntity<?> count(){
+        Long all = productService.countAll();
+        return ResponseEntity.ok(all);
+    }
+
 }

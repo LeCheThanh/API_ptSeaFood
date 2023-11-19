@@ -193,5 +193,6 @@ public class OrderService {
     public double getYearlySales(int year) {
         return orderRepository.getYearlySales(year);
     }
+    public Long countAll(){return orderRepository.count();}
 
 }
