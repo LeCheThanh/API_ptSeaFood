@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import seaFood.PTseafood.dto.ProductProductVariantRequest;
 import seaFood.PTseafood.dto.ProductStatistic;
+import seaFood.PTseafood.dto.ProductVariantRequest;
 import seaFood.PTseafood.entity.Product;
 import seaFood.PTseafood.entity.ProductVariant;
 import seaFood.PTseafood.exception.ResourceNotFoundException;
@@ -14,10 +15,7 @@ import seaFood.PTseafood.service.CategoryService;
 import seaFood.PTseafood.service.ProductService;
 import seaFood.PTseafood.service.ProductVariantService;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @CrossOrigin
@@ -44,32 +42,37 @@ public class ManageProductController {
         try{
             Product addproduct= productService.addProduct(productProductVariantRequest.getProduct());
             //tạo list productvariant mới
+            Optional<ProductVariantRequest> productVariant = productProductVariantRequest.getProductVariantRequest();
             List<ProductVariant> productVariants = new ArrayList<>();
+            if (productVariant !=null) {
+                ProductVariantRequest productVariantRequest = productVariant.orElse(null);
+                //gán giá trị từ request
+                if(productVariant!=null) {
+                    List<String> variantNames = productVariantRequest.getVariantName();
+                    List<Integer> variantQuantity = productVariantRequest.getVariantQuantity();
+                    List<String> variantPrices = productVariantRequest.getVariantPrice();
+                    List<String> variantWhosalePrice = productVariantRequest.getVariantWhosalePrice();
+                    List<String> variantDescriptions = productVariantRequest.getVariantDescription();
+                    List<String> variantImages = productVariantRequest.getVariantImage();
 
-            //gán giá trị từ request
-            List<String> variantNames = productProductVariantRequest.getProductVariantRequest().getVariantName();
-            List<Integer> variantQuantity = productProductVariantRequest.getProductVariantRequest().getVariantQuantity();
-            List<String> variantPrices = productProductVariantRequest.getProductVariantRequest().getVariantPrice();
-            List<String> variantWhosalePrice = productProductVariantRequest.getProductVariantRequest().getVariantWhosalePrice();
-            List<String> variantDescriptions = productProductVariantRequest.getProductVariantRequest().getVariantDescription();
-            List<String> variantImages = productProductVariantRequest.getProductVariantRequest().getVariantImage();
-
-            // vòng lặp để lấy giá trị từ request
-            for (int i = 0; i < variantNames.size(); i++) {
-                double price = Double.parseDouble(variantPrices.get(i).replaceAll(",", ""));
-                double whosale_price = Double.parseDouble(variantWhosalePrice.get(i).replaceAll(",", ""));
-                ProductVariant variant = new ProductVariant();
-                variant.setName(variantNames.get(i));
-                variant.setStock(variantQuantity.get(i));
-                variant.setPrice(price);
-                variant.setWhosalePrice(whosale_price);
-                variant.setImage(variantImages.get(i));
-                variant.setDescription(variantDescriptions.get(i));
-                variant.setProduct(productProductVariantRequest.getProduct());
-                //lưu vào table ProductVariant
-                productVariantService.add(variant);
-                //lưu vào mảng đã tạo trước để gán vào product
-                productVariants.add(variant);
+                    // vòng lặp để lấy giá trị từ request
+                    for (int i = 0; i < variantNames.size(); i++) {
+                        double price = Double.parseDouble(variantPrices.get(i).replaceAll(",", ""));
+                        double whosale_price = Double.parseDouble(variantWhosalePrice.get(i).replaceAll(",", ""));
+                        ProductVariant variant = new ProductVariant();
+                        variant.setName(variantNames.get(i));
+                        variant.setStock(variantQuantity.get(i));
+                        variant.setPrice(price);
+                        variant.setWhosalePrice(whosale_price);
+                        variant.setImage(variantImages.get(i));
+                        variant.setDescription(variantDescriptions.get(i));
+                        variant.setProduct(productProductVariantRequest.getProduct());
+                        //lưu vào table ProductVariant
+                        productVariantService.add(variant);
+                        //lưu vào mảng đã tạo trước để gán vào product
+                        productVariants.add(variant);
+                    }
+                }
             }
             // gán variants vào product
             // ~~ bị lỗi spring security do gán giá trị

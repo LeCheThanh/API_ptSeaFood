@@ -14,6 +14,7 @@ import seaFood.PTseafood.common.Enum;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class OrderService {
@@ -38,6 +39,9 @@ public class OrderService {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private  MailService mailService;
     ///Admin page
     public List<Order> getAll(){return orderRepository.findAll();}
     //Search by customer
@@ -86,29 +90,33 @@ public class OrderService {
             order.setPaymentStatus(Enum.PaymentStatus.UNPAID.getName());
             orderRepository.save(order);
 
-            if(payment.equals("cash")){
-                saveOrder(order,user);
-            }if(payment.equals("vnpay")){
+//            if(payment.equals("cash")){
+//                saveOrder(order,user);
+//            }else
+            if(payment.equals("vnpay")){
                 vnPayService.paymentVnPay(finalPrice,user,order.getCode());
-            }if(payment.equals("momo")){
+            }else if(payment.equals("momo")){
                 momoService.paymentMomo(finalPrice, user, order.getCode());
             }
-
             return order;
     }
 
     public String saveOrder(Order order, User user){
-        Order newOrder = orderRepository.save(order);
-        orderDetailService.create(order,user);
-        OrderState orderState = new OrderState();
-        orderState.setCreatedAt(LocalDateTime.now());
-        orderState.setUpdateAt(LocalDateTime.now());
-        orderState.setState(Enum.OrderStatus.PENDING_CONFIRMATION.getName());
-        orderState.setOrder(order);
-        orderStateRepository.save(orderState);
-        updateStock(order);
-        cartService.clearCart(user);
-        return "Thanh toán đã được xử lý. Mã đơn hàng của bạn là: " + newOrder.getCode();
+        Order order1 = getByCode(order.getCode());
+        if(order1 != null) {
+            orderDetailService.create(order1, user);
+            OrderState orderState = new OrderState();
+            orderState.setCreatedAt(LocalDateTime.now());
+            orderState.setUpdateAt(LocalDateTime.now());
+            orderState.setState(Enum.OrderStatus.PENDING_CONFIRMATION.getName());
+            orderState.setOrder(order1);
+            orderStateRepository.save(orderState);
+            mailService.sendConfirmationEmail(order1, user);
+            updateStock(order1);
+            cartService.clearCart(user);
+            return "Thanh toán đã được xử lý. Mã đơn hàng của bạn là: " + order1.getCode();
+        }
+        return null;
     }
 
     //update State by user
@@ -194,5 +202,14 @@ public class OrderService {
         return orderRepository.getYearlySales(year);
     }
     public Long countAll(){return orderRepository.count();}
-
+    public Long countPaidOrders() {
+        return orderRepository.countByPaymentStatus(Enum.PaymentStatus.PAID.getName());
+    }
+    public Long countByShippingState(){
+        return orderStateRepository.countByState(Enum.OrderStatus.SHIPPING.getName());
+    }
+    public List<Order> getLatesOrder(){
+        List<Order> orders=orderRepository.findLatestOrder();
+        return orders;
+    }
 }

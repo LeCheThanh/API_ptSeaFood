@@ -3,12 +3,15 @@ package seaFood.PTseafood.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import seaFood.PTseafood.dto.OrderResponse;
 import seaFood.PTseafood.entity.Order;
 import seaFood.PTseafood.service.OrderService;
 import seaFood.PTseafood.entity.OrderState;
 import seaFood.PTseafood.exception.ResourceNotFoundException;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @CrossOrigin
 @RestController
@@ -52,7 +55,37 @@ public class ManageOrderController {
     }
     @GetMapping("/count")
     public ResponseEntity<?> count(){
-        Long all = orderService.countAll();
+        Long all = orderService.countPaidOrders();
         return ResponseEntity.ok(all);
+    }
+    @GetMapping("/count/shippingstate")
+    public ResponseEntity<?> countState(){
+        Long all = orderService.countByShippingState();
+        if(all==null){
+            return ResponseEntity.ok(0);
+        }
+        return ResponseEntity.ok(all);
+    }
+    @GetMapping("/latest-order")
+    public ResponseEntity<?> getLatestOrder(){
+        List<Order> orders = orderService.getLatesOrder();
+        if(orders.isEmpty()){
+            return ResponseEntity.badRequest().body("Không có order nào");
+        }
+        List<OrderResponse> orderResponseList = new ArrayList<>();
+        for(Order o : orders){
+            OrderResponse orderResponse = new OrderResponse();
+            orderResponse.setOrderState(o.getOrderStates());
+            orderResponse.setCode(o.getCode());
+            orderResponse.setId(o.getId());
+            orderResponse.setPayment(o.getPaymentMethod());
+            orderResponse.setFinalPrice(o.getFinalPrice());
+            orderResponse.setReceiverAddress(o.getReceiverAddress());
+            orderResponse.setReceiverEmail(o.getReceiverEmail());
+            orderResponse.setReceiverName(o.getReceiverName());
+            orderResponse.setReceiverPhone(o.getReceiverPhone());
+            orderResponseList.add(orderResponse);
+        }
+        return ResponseEntity.ok(orderResponseList);
     }
 }

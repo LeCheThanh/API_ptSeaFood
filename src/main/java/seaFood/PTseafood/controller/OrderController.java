@@ -44,8 +44,6 @@ public class OrderController {
     public ResponseEntity<?> createOrder(@RequestBody OrderRequest orderRequest, HttpServletRequest request) {
         try {
             User user = jwtUtil.getUserFromToken(request);
-            Order order = orderService.process(orderRequest, user);
-
             if(orderRequest.getReceiverEmail()==null && user.getEmail()==null){
                 return ResponseEntity.badRequest().body("Email không được để trống");
             }
@@ -69,6 +67,7 @@ public class OrderController {
             if(!orderRequest.getPayment().equals("momo")&&!orderRequest.getPayment().equals("cash")&&!orderRequest.getPayment().equals("vnpay")){
                 return ResponseEntity.badRequest().body("Phương thức thanh toán không hợp lệ");
             }
+            Order order = orderService.process(orderRequest, user);
             if("vnpay".equalsIgnoreCase(orderRequest.getPayment())){
                     VnPayResponse vnPayResponse = vnPayService.paymentVnPay(order.getFinalPrice(), user,order.getCode());
                 return ResponseEntity.ok(vnPayResponse.getURL());
