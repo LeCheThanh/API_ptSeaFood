@@ -7,4 +7,5 @@ import seaFood.PTseafood.entity.OrderState;
 @Repository
 public interface IOrderStateRepository extends JpaRepository<OrderState, Long> {
     OrderState findByOrder(Order orderId);
+    Long countByState(String state );
 }

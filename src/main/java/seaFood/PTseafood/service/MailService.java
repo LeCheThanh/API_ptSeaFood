@@ -41,6 +41,7 @@ public class MailService {
         String receiverName = order.getReceiverName();
         String receiverPhone = order.getReceiverPhone();
         String receiverAddress = order.getReceiverAddress();
+        Double finalPrice = order.getFinalPrice();
         String code = order.getCode();
         StringBuilder strProduct = new StringBuilder();
         double totalPrice = 0.0;
@@ -72,7 +73,7 @@ public class MailService {
             htmlTemplate = htmlTemplate.replace("${customerAddress}", receiverAddress);
             htmlTemplate = htmlTemplate.replace("${code}", code);
             htmlTemplate = htmlTemplate.replace("${orderVariants}", strProduct);
-            htmlTemplate = htmlTemplate.replace("${tongTien}", NumberUtil.formatNumber(totalPrice));
+            htmlTemplate = htmlTemplate.replace("${tongTien}", NumberUtil.formatNumber(finalPrice));
             helper.setText(htmlTemplate, true);
 
             // Gửi email

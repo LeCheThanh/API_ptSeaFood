@@ -2,6 +2,7 @@ package seaFood.PTseafood.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.util.Set;
@@ -9,6 +10,7 @@ import java.util.Set;
 @Data
 @Entity
 @Table(name="categories")
+@NoArgsConstructor
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,5 +28,7 @@ public class Category {
 
     @OneToMany(mappedBy="category",cascade = CascadeType.ALL )
     private Set<Product> products;
-
+    public Category(String id) {
+        this.id = Long.valueOf(id);
+    }
 }
