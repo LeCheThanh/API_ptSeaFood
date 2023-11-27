@@ -40,8 +40,11 @@ public class ManageProductController {
     @PostMapping("/product")
     public ResponseEntity<?> addProduct(@RequestBody ProductProductVariantRequest productProductVariantRequest) {
         try{
-            Product addproduct= productService.addProduct(productProductVariantRequest.getProduct());
             //tạo list productvariant mới
+            Product addproduct = null;
+            if(productProductVariantRequest.getProduct() != null){
+                addproduct = productService.addProduct(productProductVariantRequest.getProduct());
+            }
             Optional<ProductVariantRequest> productVariant = productProductVariantRequest.getProductVariantRequest();
             List<ProductVariant> productVariants = new ArrayList<>();
             if (productVariant !=null) {
@@ -77,7 +80,6 @@ public class ManageProductController {
             // gán variants vào product
             // ~~ bị lỗi spring security do gán giá trị
 //            addproduct.setProductVariants(productVariants);
-
             return ResponseEntity.ok(addproduct);
         }catch (Exception ex){
             return ResponseEntity.badRequest().body("Thêm sản phẩm thất bại "+ ex.getMessage());
