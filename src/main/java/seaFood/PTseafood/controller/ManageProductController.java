@@ -161,5 +161,30 @@ public class ManageProductController {
         Long all = productService.countAll();
         return ResponseEntity.ok(all);
     }
+        @GetMapping("product/{id}/variant")
+        public  ResponseEntity<?> getVariantByProduct(@PathVariable Long id){
+            try{
+                Product product = productService.getById(id);
+                if(product == null) {
+                    return ResponseEntity.badRequest().body("Không tìm thấy product có id: " + id);
+                }
+                List<ProductVariant> listVariant = productVariantService.getVariantByProduct(product);
+                if(listVariant.isEmpty()){
+                    return ResponseEntity.ok(0);
+                }
+                return ResponseEntity.ok(listVariant);
+            }catch (Exception e){
+                return ResponseEntity.internalServerError().body("Lỗi server");
+            }
+
+        }
+    //Del
+    @DeleteMapping("/product/variant/{id}")
+    public ResponseEntity<Map<String,Boolean>> deleteVariant(@PathVariable Long id){
+        productVariantService.deleteVariant(id);
+        Map<String,Boolean> reponse = new HashMap<>();
+        reponse.put("deleted",Boolean.TRUE);
+        return ResponseEntity.ok(reponse);
+    }
 
 }

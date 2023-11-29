@@ -50,5 +50,8 @@ public class ProductVariantService {
 
         return productStatistics;
     }
-
+    public List<ProductVariant> getVariantByProduct(Product product){
+        return productVariantRepository.findByProduct(product);
+    }
+    public void deleteVariant(Long id){productVariantRepository.deleteById(id);}
 }
