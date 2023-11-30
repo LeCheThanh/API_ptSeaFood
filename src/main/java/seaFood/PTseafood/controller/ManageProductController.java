@@ -15,6 +15,7 @@ import seaFood.PTseafood.service.CategoryService;
 import seaFood.PTseafood.service.ProductService;
 import seaFood.PTseafood.service.ProductVariantService;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -186,5 +187,55 @@ public class ManageProductController {
         reponse.put("deleted",Boolean.TRUE);
         return ResponseEntity.ok(reponse);
     }
+    //update Variant
+    @PutMapping("/product/variant/{id}")
+    public ResponseEntity<?> updateVariant(@PathVariable Long id,@RequestBody  ProductVariant productVariant){
+        try {
+            ProductVariant updateVariant = productVariantService.updateVariant(id,productVariant);
+            return ResponseEntity.ok(updateVariant);
+        }catch (ResourceNotFoundException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    //create Variant
+    @PostMapping("/product/{id}/variant")
+    public ResponseEntity<?> createVariant(@PathVariable Long id,@RequestBody ProductVariant productVariant){
+        try{
+            Product product = productService.getById(id);
+            String name = productVariant.getName();
+            String description = productVariant.getDescription();
+            double price = productVariant.getPrice();
+            double whosalePrice = productVariant.getWhosalePrice();
+            String image = productVariant.getImage();
+            int stock = productVariant.getStock();
+            ProductVariant updateVariant = new ProductVariant();
 
+            updateVariant.setName(name);
+            updateVariant.setStock(stock);
+            updateVariant.setPrice(price);
+            updateVariant.setDescription(description);
+            updateVariant.setWhosalePrice(whosalePrice);
+            updateVariant.setImage(image);
+            updateVariant.setProduct(product);
+            product.setUpdateAt(LocalDateTime.now());
+            productVariantService.add(updateVariant);
+            return ResponseEntity.ok(updateVariant);
+        }catch (Exception exception){
+            return ResponseEntity.internalServerError().body(exception.getMessage());
+        }
+    }
+    //get Variant by id
+    @GetMapping("/product/variant/{id}")
+    public ResponseEntity<?> getVariantById(@PathVariable Long id){
+        try{
+            ProductVariant productVariant = productVariantService.getById(id);
+            if(productVariant != null) {
+                return ResponseEntity.ok(productVariant);
+            }else
+                return ResponseEntity.badRequest().body("Không tìm thấy variant");
+        }catch (Exception exception){
+            return ResponseEntity.internalServerError().body("Server bị lỗi !!");
+        }
+
+    }
 }

@@ -2,6 +2,7 @@ package seaFood.PTseafood.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import seaFood.PTseafood.entity.Category;
 import seaFood.PTseafood.entity.Product;
 import seaFood.PTseafood.entity.ProductVariant;
 import seaFood.PTseafood.repository.IProductRepository;
@@ -9,8 +10,10 @@ import seaFood.PTseafood.repository.IProductVariantRepository;
 import seaFood.PTseafood.utils.SlugUtil;
 import seaFood.PTseafood.dto.ProductStatistic;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductVariantService {
@@ -54,4 +57,24 @@ public class ProductVariantService {
         return productVariantRepository.findByProduct(product);
     }
     public void deleteVariant(Long id){productVariantRepository.deleteById(id);}
+    public ProductVariant updateVariant(Long id,ProductVariant variant)
+    {
+        ProductVariant existingVariant = productVariantRepository.findById(id).orElse(null);
+        Optional<Product> existingProduct = productRepository.findById(existingVariant.getProduct().getId());
+        Product product = existingProduct.get();
+        if (existingVariant != null) {
+
+            existingVariant.setName(variant.getName());
+            existingVariant.setDescription(variant.getDescription());
+            String slug = SlugUtil.createSlug(variant.getName());
+            existingVariant.setImage(variant.getImage());
+            existingVariant.setSlug(slug);
+            existingVariant.setStock(variant.getStock());
+            existingVariant.setPrice(variant.getPrice());
+            existingVariant.setWhosalePrice(variant.getWhosalePrice());
+            product.setUpdateAt(LocalDateTime.now());
+            return save(existingVariant);
+        }
+        return null;
+    }
 }
