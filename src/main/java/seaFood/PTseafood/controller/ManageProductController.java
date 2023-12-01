@@ -98,9 +98,9 @@ public class ManageProductController {
     }
     //update
     @PutMapping("/product/{id}")
-    public ResponseEntity<?> updateProduct(@PathVariable Long id,@RequestBody  Product productDetail,@RequestParam Long cateId){
+    public ResponseEntity<?> updateProduct(@PathVariable Long id,@RequestBody  Product productDetail){
         try {
-            Product updateProduct = productService.updateProduct(id,productDetail,cateId);
+            Product updateProduct = productService.updateProduct(id,productDetail);
             return ResponseEntity.ok(updateProduct);
         }catch (ResourceNotFoundException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

@@ -47,18 +47,18 @@ public class ProductService {
         productRepository.deleteById(id);
     }
 
-    public Product updateProduct(Long id,Product product, Long categoryId)
+    public Product updateProduct(Long id,Product product)
     {
                 Product existingProduct = productRepository.findById(id).orElse(null);
-                Category category = categoryRepository.findById(categoryId).orElse(null);
+//                Category category = categoryRepository.findById(categoryId).orElse(null);
                 if (existingProduct != null) {
 
                     existingProduct.setName(product.getName());
                     existingProduct.setDescription(product.getDescription());
                     String slug = SlugUtil.createSlug(product.getName());
-                    product.setSlug(slug);
+                    existingProduct.setSlug(slug);
                     existingProduct.setImage(product.getImage());
-                    existingProduct.setCategory(category);
+                    existingProduct.setCategory(product.getCategory());
                     existingProduct.setUpdateAt(now);
                     return save(existingProduct);
 
