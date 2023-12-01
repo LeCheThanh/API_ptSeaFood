@@ -26,9 +26,9 @@ public class ManageCategoryController {
     }
     //Create
     @PostMapping("/category")
-    public Category addCategory(@RequestBody Category category) {
+    public ResponseEntity<?> addCategory(@RequestBody Category category) {
         Category addcate= categoryService.addCategory(category);
-        return addcate;
+        return ResponseEntity.ok(addcate);
     }
     //get by id
     @GetMapping("/category/{id}")
@@ -47,7 +47,6 @@ public class ManageCategoryController {
             Category category = categoryService.getCategoryById(id);
             category.setName(categoryDetail.getName());
             category.setDescription(categoryDetail.getDescription());
-            category.setParentId(categoryDetail.getParentId());
             Category updateCate = categoryService.updateCategory(category);
             return ResponseEntity.ok(updateCate);
         }catch (ResourceNotFoundException e) {

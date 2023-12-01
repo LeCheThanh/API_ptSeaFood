@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -26,7 +27,7 @@ public class Category {
 
     private String slug;
 
-    @OneToMany(mappedBy="category",cascade = CascadeType.ALL )
+    @OneToMany(mappedBy="category",cascade = CascadeType.ALL)
     private Set<Product> products;
     public Category(String id) {
         this.id = Long.valueOf(id);
