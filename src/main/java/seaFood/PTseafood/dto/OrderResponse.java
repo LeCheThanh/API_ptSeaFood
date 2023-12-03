@@ -3,6 +3,7 @@ package seaFood.PTseafood.dto;
 import lombok.Data;
 import seaFood.PTseafood.entity.OrderState;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -16,4 +17,5 @@ public class OrderResponse {
     private String receiverAddress;
     private String payment;
     private Double finalPrice;
+    private LocalDateTime createdAt;
 }
