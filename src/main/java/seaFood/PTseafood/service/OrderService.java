@@ -90,9 +90,9 @@ public class OrderService {
             order.setPaymentStatus(Enum.PaymentStatus.UNPAID.getName());
             orderRepository.save(order);
 
-//            if(payment.equals("cash")){
-//                saveOrder(order,user);
-//            }else
+            if(payment.equals("cash")){
+                saveOrder(order,user);
+            }else
             if(payment.equals("vnpay")){
                 vnPayService.paymentVnPay(finalPrice,user,order.getCode());
             }else if(payment.equals("momo")){
