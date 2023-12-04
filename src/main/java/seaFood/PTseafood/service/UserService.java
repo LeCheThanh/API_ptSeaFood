@@ -56,6 +56,9 @@ public class UserService {
         // Lưu thông tin người dùng đã cập nhật
         return userRepository.save(existingUser);
     }
+    public List<User> getAllUser(){
+        return userRepository.findAll();
+    }
     public Optional<User> getById(Long id){
         return userRepository.findById(id);
     }
