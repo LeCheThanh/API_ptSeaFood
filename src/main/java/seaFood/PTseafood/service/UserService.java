@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import seaFood.PTseafood.common.Enum;
+import seaFood.PTseafood.dto.CreateUserRequest;
 import seaFood.PTseafood.dto.RegisterRequest;
 import seaFood.PTseafood.dto.UpdateUserRequest;
 import seaFood.PTseafood.entity.Role;
@@ -91,11 +92,31 @@ public class UserService {
             }
         }
         user.setRoles(updatedRoles);
-        System.out.println(updatedRoles);
-//        addtoUser()
         userRepository.save(user);
     }
     ///---------------------------------
+    public User createUser(CreateUserRequest createUserRequest){
+        var user = new User();
+        user.setPassword(passwordEncoder.encode(createUserRequest.getPassword()));
+        user.setEmail(createUserRequest.getEmail());
+        user.setRank(Enum.Rank.unRank);
+        user.setProvider(Enum.Provider.LOCAL);
+        user.setWholeSale(createUserRequest.isWholeSale());
+        user.setTotalPurchaseAmount(new BigInteger("0"));
+        Set<String> roleList = createUserRequest.getRoles();
+        Set<Role> updatedRoles = new HashSet<>();
+        for (String roleName : roleList) {
+            Role role = roleRepository.findByName(String.valueOf(roleName));
+            if (role != null) {
+                updatedRoles.add(role);
+            } else {
+                var message = "Vai trò không tồn tại";
+                throw new RoleNotFoundException(message, roleName);
+            }
+        }
+        user.setRoles(updatedRoles);
+        return userRepository.save(user);
+    }
     @Transactional
     public void updateRankForUsers() {
         List<User> users = userRepository.findAll();
