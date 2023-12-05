@@ -5,6 +5,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import seaFood.PTseafood.dto.OrderResponse;
 import seaFood.PTseafood.entity.Order;
+import seaFood.PTseafood.entity.OrderDetail;
+import seaFood.PTseafood.service.OrderDetailService;
 import seaFood.PTseafood.service.OrderService;
 import seaFood.PTseafood.entity.OrderState;
 import seaFood.PTseafood.exception.ResourceNotFoundException;
@@ -19,11 +21,13 @@ import java.util.Optional;
 public class ManageOrderController {
     @Autowired
     private OrderService orderService;
+    @Autowired
+    private OrderDetailService orderDetailService;
     @PutMapping("/{orderId}/update-state")
-    public ResponseEntity<String> updateOrderStateByAdmin(@PathVariable Long orderId) {
+    public ResponseEntity<?> updateOrderStateByAdmin(@PathVariable Long orderId) {
         try {
             OrderState updatedOrderState = orderService.updateOrderStateByAdmin(orderId);
-            return ResponseEntity.ok("Cập nhật trạng thái đơn hàng thành công. Trạng thái mới: " + updatedOrderState.getState());
+            return ResponseEntity.ok( updatedOrderState);
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -84,8 +88,42 @@ public class ManageOrderController {
             orderResponse.setReceiverEmail(o.getReceiverEmail());
             orderResponse.setReceiverName(o.getReceiverName());
             orderResponse.setReceiverPhone(o.getReceiverPhone());
+            orderResponse.setCreatedAt(o.getCreatedAt());
             orderResponseList.add(orderResponse);
         }
         return ResponseEntity.ok(orderResponseList);
+    }
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllWithState(){
+        List<Order> orders = orderService.getAll();
+        if(orders.isEmpty()){
+            return ResponseEntity.badRequest().body("hiện tại chưa có đơn hàng nào!");
+        }
+        List<OrderResponse> orderResponseList = new ArrayList<>();
+        for(Order o : orders){
+            OrderResponse orderResponse = new OrderResponse();
+            orderResponse.setOrderState(o.getOrderStates());
+            orderResponse.setCode(o.getCode());
+            orderResponse.setId(o.getId());
+            orderResponse.setPayment(o.getPaymentMethod());
+            orderResponse.setFinalPrice(o.getFinalPrice());
+            orderResponse.setReceiverAddress(o.getReceiverAddress());
+            orderResponse.setReceiverEmail(o.getReceiverEmail());
+            orderResponse.setReceiverName(o.getReceiverName());
+            orderResponse.setCreatedAt(o.getCreatedAt());
+            orderResponse.setReceiverPhone(o.getReceiverPhone());
+            orderResponseList.add(orderResponse);
+        }
+
+        return ResponseEntity.ok(orderResponseList);
+    }
+    @GetMapping("/detail/{id}")
+    public ResponseEntity<?> getDetailByOrder(@PathVariable Long id){
+        List<OrderDetail> details =orderDetailService.getByOrder(id);
+        if (details.isEmpty()){
+            /// Khong ton` tai order
+            return ResponseEntity.badRequest().body("Order này 0 có chi tiết");
+        }
+        return ResponseEntity.ok(details);
     }
 }
