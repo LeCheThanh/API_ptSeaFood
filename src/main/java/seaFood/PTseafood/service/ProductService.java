@@ -50,7 +50,7 @@ public class ProductService {
     public Product updateProduct(Long id,Product product)
     {
                 Product existingProduct = productRepository.findById(id).orElse(null);
-//                Category category = categoryRepository.findById(categoryId).orElse(null);
+                Category category = categoryRepository.findById(product.getCategory().getId()).orElse(null);
                 if (existingProduct != null) {
 
                     existingProduct.setName(product.getName());
@@ -58,7 +58,7 @@ public class ProductService {
                     String slug = SlugUtil.createSlug(product.getName());
                     existingProduct.setSlug(slug);
                     existingProduct.setImage(product.getImage());
-                    existingProduct.setCategory(product.getCategory());
+                    existingProduct.setCategory(category);
                     existingProduct.setUpdateAt(now);
                     return save(existingProduct);
 
