@@ -201,6 +201,9 @@ public class OrderService {
     public double getYearlySales(int year) {
         return orderRepository.getYearlySales(year);
     }
+    public double getMonthlySalesByPayment(int year, int month,String method){
+        return orderRepository.getMonthlySalesByPayment(year,month,method);
+    }
     public Long countAll(){return orderRepository.count();}
     public Long countPaidOrders() {
         return orderRepository.countByPaymentStatus(Enum.PaymentStatus.PAID.getName());

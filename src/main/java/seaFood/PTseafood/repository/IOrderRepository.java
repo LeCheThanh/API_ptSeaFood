@@ -23,6 +23,9 @@ public interface IOrderRepository  extends JpaRepository<Order,Long> {
     @Query("SELECT COALESCE(SUM(o.finalPrice), 0) FROM Order o WHERE o.paymentStatus = 'Đã thanh toán' AND YEAR(o.createdAt) = :year AND MONTH(o.createdAt) = :month")
     double getMonthlySales( int year, int month);
 
+    @Query("SELECT COALESCE(SUM(o.finalPrice), 0) FROM Order o WHERE o.paymentStatus = 'Đã thanh toán' AND YEAR(o.createdAt) = :year AND MONTH(o.createdAt) = :month AND o.paymentMethod = :method ")
+    double getMonthlySalesByPayment( int year, int month, String method);
+
     @Query("SELECT COALESCE(SUM(o.finalPrice), 0) FROM Order o WHERE o.paymentStatus = 'Đã thanh toán' AND YEAR(o.createdAt) = :year")
     double getYearlySales(int year);
 

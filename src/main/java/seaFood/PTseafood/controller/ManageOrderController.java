@@ -126,4 +126,9 @@ public class ManageOrderController {
         }
         return ResponseEntity.ok(details);
     }
+    @GetMapping("/method")
+    public ResponseEntity<Double> getMonthlySalesByPayment(@RequestParam int year,@RequestParam int month, @RequestParam String method) {
+        double monthlySalesByPayment = orderService.getMonthlySalesByPayment(year,month,method);
+        return ResponseEntity.ok(monthlySalesByPayment);
+    }
 }
