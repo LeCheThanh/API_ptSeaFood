@@ -61,4 +61,15 @@ public class JwtUtil {
         List<String> roles = decodedJWT.getClaim("roles").asList(String.class);
         return roles;
     }
+    public String getEmailFromToken(String token) {
+        DecodedJWT decodedJWT = JWT.decode(token);
+        String email = decodedJWT.getSubject();
+        return email;
+    }
+    public String getFullNameFromToken(String token) {
+        DecodedJWT decodedJWT = JWT.decode(token);
+        String fullName = String.valueOf(decodedJWT.getClaim("fullName"));
+        fullName = fullName.replace("\"", "");
+        return fullName;
+    }
 }

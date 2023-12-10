@@ -22,6 +22,7 @@ public class JwtService {
                 .withSubject(user.getEmail())
                 .withExpiresAt(new Date(System.currentTimeMillis() +1000 * 60 * 1000))
                 .withClaim("roles",authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
+                .withClaim("fullName", user.getFullName())
                 .sign(algorithm);
     }
     public String generateRefreshToken(User user, Collection<SimpleGrantedAuthority> authorities){
@@ -31,6 +32,7 @@ public class JwtService {
                 .withSubject(user.getEmail())
                 .withExpiresAt(new Date(System.currentTimeMillis() +40 *60 * 1000))
                 .withClaim("roles",authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
+                .withClaim("fullName", user.getFullName())
                 .sign(algorithm);
     }
 }
