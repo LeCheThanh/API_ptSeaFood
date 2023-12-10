@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import seaFood.PTseafood.entity.Product;
 import seaFood.PTseafood.service.ProductService;
+import seaFood.PTseafood.service.ProductVariantService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +17,9 @@ import java.util.stream.Collectors;
 public class ProductController {
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private ProductVariantService productVariantService;
     @GetMapping("/search")
     public ResponseEntity<?> search(@RequestParam("keyword") String keyword)  { // dùng chấm hỏi chỗ <?> để cho
         // kiểu đại diện vì phải trả về message và list book!
@@ -47,5 +51,11 @@ public class ProductController {
                 .collect(Collectors.toList());
 
         return searchResults;
+    }
+
+    @GetMapping("/top-selling")
+    public ResponseEntity<List<Product>> getTopSellingProducts() {
+        List<Product> topSellingProducts = productVariantService.getTopSellingProducts();
+        return ResponseEntity.ok(topSellingProducts);
     }
 }

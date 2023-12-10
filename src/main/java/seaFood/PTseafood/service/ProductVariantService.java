@@ -11,9 +11,7 @@ import seaFood.PTseafood.utils.SlugUtil;
 import seaFood.PTseafood.dto.ProductStatistic;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class ProductVariantService {
@@ -52,6 +50,21 @@ public class ProductVariantService {
         }
 
         return productStatistics;
+    }
+    //Top 10 san pham ban chạy
+    public List<Product> getTopSellingProducts() {
+        List<ProductStatistic> productStatistics = getProductStatistics();
+
+        // Sắp xếp theo lượng bán giảm dần
+        Collections.sort(productStatistics, Comparator.comparingInt(ProductStatistic::getTotalSoldQuantity).reversed());
+
+        // Lấy top 10 sản phẩm
+        List<Product> topSellingProducts = new ArrayList<>();
+        for (int i = 0; i < Math.min(10, productStatistics.size()); i++) {
+            topSellingProducts.add(productStatistics.get(i).getProduct());
+        }
+
+        return topSellingProducts;
     }
     public List<ProductVariant> getVariantByProduct(Product product){
         return productVariantRepository.findByProduct(product);
