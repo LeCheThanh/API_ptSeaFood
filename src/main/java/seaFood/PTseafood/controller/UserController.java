@@ -2,20 +2,25 @@ package seaFood.PTseafood.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.coyote.Response;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import seaFood.PTseafood.auth.AuthenticationReponse;
+import seaFood.PTseafood.auth.AuthenticationRequest;
 import seaFood.PTseafood.dto.RegisterRequest;
 import seaFood.PTseafood.dto.UpdateUserRequest;
 import seaFood.PTseafood.entity.User;
 import seaFood.PTseafood.exception.ResourceNotFoundException;
 import seaFood.PTseafood.repository.IUserRepository;
+import seaFood.PTseafood.service.AuthenticationService;
 import seaFood.PTseafood.service.UserService;
 import seaFood.PTseafood.utils.EmailValidator;
 import seaFood.PTseafood.utils.JwtUtil;
 import seaFood.PTseafood.utils.PasswordUtil;
 
+import java.util.List;
 import java.util.Optional;
 
 @CrossOrigin
@@ -29,6 +34,9 @@ public class UserController {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private AuthenticationService authenticationService;
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody RegisterRequest registerRequest){
@@ -67,6 +75,38 @@ public class UserController {
             return  ResponseEntity.ok(user);
         }catch (RuntimeException e){
             return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
+    @PostMapping("/login")
+        public ResponseEntity<?> login(@RequestBody AuthenticationRequest authenticationRequest){
+            JSONObject responseJson = new JSONObject();
+            try {
+                AuthenticationReponse response = authenticationService.authenticationReponse(authenticationRequest);
+                String token = response.getToken();
+                String refreshToken = response.getRefreshToken();
+                String email = jwtUtil.getEmailFromToken(token);
+                String fullName = jwtUtil.getFullNameFromToken(token);
+                responseJson.put("message","Đăng nhập thành công");
+                responseJson.put("token",token);
+                responseJson.put("refreshToken",refreshToken);
+                responseJson.put("email",email);
+                responseJson.put("fullName",fullName);
+                return ResponseEntity.ok(responseJson.toString());
+        } catch (RuntimeException e) {
+            if(authenticationRequest.getEmail().isEmpty() & authenticationRequest.getPassword().isEmpty()){
+                responseJson.put("message","Không được trống");
+                return ResponseEntity.badRequest().body(responseJson.toString());
+            }
+            if(authenticationRequest.getEmail().isEmpty() || authenticationRequest.getPassword().isEmpty()){
+                responseJson.put("message","Không được để trống email hoặc mật khẩu");
+                return ResponseEntity.badRequest().body(responseJson.toString());
+            }
+            if(!EmailValidator.validateEmail(authenticationRequest.getEmail())){
+                responseJson.put("message","Email không đúng định dạng!");
+                return ResponseEntity.badRequest().body(responseJson.toString());
+            }
+            responseJson.put("message","Sai email hoặc mật khẩu");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseJson.toString());
         }
     }
 
