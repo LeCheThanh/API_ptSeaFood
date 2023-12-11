@@ -1,5 +1,6 @@
 package seaFood.PTseafood.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,6 +10,7 @@ import seaFood.PTseafood.entity.User;
 import seaFood.PTseafood.service.FavoriteService;
 import seaFood.PTseafood.service.ProductService;
 import seaFood.PTseafood.service.UserService;
+import seaFood.PTseafood.utils.JwtUtil;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,7 +18,7 @@ import java.util.Optional;
 @CrossOrigin
 @RestController
 @RequestMapping("/api/favorite")
-public class FavoriteController {
+public class        FavoriteController {
     @Autowired
     private FavoriteService favoriteService;
     @Autowired
@@ -24,11 +26,15 @@ public class FavoriteController {
     @Autowired
     private ProductService productService;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
     //GetAll
-    @GetMapping("/all/{id}")
-    public ResponseEntity<?> getAll(@PathVariable Long id) {
+    @GetMapping("/all")
+    public ResponseEntity<?> getAll(HttpServletRequest request) {
         try{
-            List<Favorite> favorites = favoriteService.getFavoritesByUser(id);
+            User user = jwtUtil.getUserFromToken(request);
+            List<Favorite> favorites = favoriteService.getFavoritesByUser(user);
             if(favorites.isEmpty()){
                 return ResponseEntity.badRequest().body("Không có sản phẩm yêu thích");
             }
@@ -39,17 +45,18 @@ public class FavoriteController {
     }
     //add to favorite
     @PostMapping("/add")
-    public ResponseEntity<?> addToFavorite(@RequestParam Long userId, @RequestParam Long productId){
-        Optional<User> userOptional = userService.getById(userId);
-        if (userOptional.isEmpty()) {
-            return ResponseEntity.badRequest().body("sai user id");
+    public ResponseEntity<?> addToFavorite(HttpServletRequest request, @RequestParam Long productId){
+        // Lấy thông tin người dùng từ token
+        try {
+            User user = jwtUtil.getUserFromToken(request);
+            Product product = productService.getById(productId);
+            if (product == null) {
+                return ResponseEntity.badRequest().body("sai productid");
+            }
+            Favorite favorite = favoriteService.addToFavorites(user, product);
+            return ResponseEntity.ok(favorite);
+        }catch (RuntimeException e){
+            return  ResponseEntity.badRequest().body(e.getMessage());
         }
-        User user = userOptional.get();
-        Product product = productService.getById(productId);
-        if (product == null) {
-            return ResponseEntity.badRequest().body("sai productid");
-        }
-        Favorite favorite = favoriteService.addToFavorites(user, product);
-        return ResponseEntity.ok(favorite);
     }
 }

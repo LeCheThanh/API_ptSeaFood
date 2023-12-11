@@ -18,12 +18,7 @@ public class FavoriteService {
     @Autowired
     private UserService userService;
     //Lấy tất cả sản phẩm trong ds yêu thích của user
-    public List<Favorite> getFavoritesByUser(Long id) {
-        Optional<User> userOptional  = userService.getById(id);
-        if (userOptional.isEmpty()) {
-            throw new ResourceNotFoundException("User not found");
-        }
-        User user = userOptional.get();
+    public List<Favorite> getFavoritesByUser(User user) {
         return favoriteRepository.findAllByUser(user);
 
     }
@@ -39,8 +34,9 @@ public class FavoriteService {
             favorite.setProduct(product);
             return favoriteRepository.save(favorite);
         }
-
-        return existingFavorite;
+        else {
+            throw new RuntimeException("Sản phẩm đã tồn tại trong danh sách yêu thích");
+        }
     }
     //xóa khỏi ds yêu thích
     public void removeFromFavorites(User user, Product product) {
