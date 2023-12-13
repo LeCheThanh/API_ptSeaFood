@@ -36,7 +36,7 @@ public class        FavoriteController {
             User user = jwtUtil.getUserFromToken(request);
             List<Favorite> favorites = favoriteService.getFavoritesByUser(user);
             if(favorites.isEmpty()){
-                return ResponseEntity.badRequest().body("Không có sản phẩm yêu thích");
+                return ResponseEntity.ok().body(0);
             }
             return ResponseEntity.ok(favorites);
         }catch (RuntimeException ex){
@@ -57,6 +57,19 @@ public class        FavoriteController {
             return ResponseEntity.ok(favorite);
         }catch (RuntimeException e){
             return  ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    //xoa
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> delFavorite(HttpServletRequest request,@RequestParam Long id){
+        try{
+            User user = jwtUtil.getUserFromToken(request);
+            Product product = productService.getById(id);
+            favoriteService.removeFromFavorites(user,product);
+            List<Favorite> favorites = favoriteService.getFavoritesByUser(user);
+            return ResponseEntity.ok(favorites);
+        }catch (Exception e){
+            return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
 }
