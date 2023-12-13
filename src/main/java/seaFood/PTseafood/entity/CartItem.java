@@ -17,12 +17,12 @@ public class CartItem {
     @JoinColumn(name = "user_id",referencedColumnName = "id")
     private User user;
 
-    @JsonIgnore
+
     @ManyToOne
     @JoinColumn(name = "product_id",referencedColumnName = "id")
     private Product product;
 
-    @JsonIgnore
+
     @ManyToOne
     @JoinColumn(name = "product_variant_id",referencedColumnName = "id")
     private ProductVariant productVariant;
