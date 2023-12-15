@@ -3,7 +3,7 @@ package seaFood.PTseafood.dto;
 import lombok.Data;
 
 @Data
-public class    UpdateUserRequest {
+public class UpdateUserRequest {
 
     private String fullName;
 
