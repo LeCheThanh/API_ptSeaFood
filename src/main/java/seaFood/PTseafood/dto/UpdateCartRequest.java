@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class UpdateCartRequest {
-    private Long cartItemId;
-    private int newQuantity;
+        private Long cartItemId;
+        private int newQuantity;
 }

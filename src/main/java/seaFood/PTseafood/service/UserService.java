@@ -46,16 +46,13 @@ public class UserService {
         }
     }
     //update thong tin co ban
-    public User updateUser(Long userId, UpdateUserRequest updatedUser) {
-        User existingUser = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-
+    public User updateUser(User user, UpdateUserRequest updatedUser) {
         // Cập nhật thông tin người dùng với dữ liệu từ updatedUser
-        existingUser.setFullName(updatedUser.getFullName());
-        existingUser.setPhone(updatedUser.getPhone());
-        existingUser.setAddress(updatedUser.getAddress());
+        user.setFullName(updatedUser.getFullName());
+        user.setPhone(updatedUser.getPhone());
+        user.setAddress(updatedUser.getAddress());
         // Lưu thông tin người dùng đã cập nhật
-        return userRepository.save(existingUser);
+        return userRepository.save(user);
     }
     public List<User> getAllUser(){
         return userRepository.findAll();

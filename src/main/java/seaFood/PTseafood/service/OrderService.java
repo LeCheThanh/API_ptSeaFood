@@ -184,9 +184,6 @@ public class OrderService {
     //Get all order by user
     public List<Order> getAllByUser(User user){
         List<Order> orderByUser = orderRepository.findByUser(user);
-//        if(orderByUser.isEmpty()){
-//            throw new ResourceNotFoundException("User này không có đơn hàng!");
-//        }
         return orderByUser;
     }
     ///Thong ke
