@@ -68,4 +68,10 @@ public class ProductService {
     public List<Product> findByNameContaining (String keyword){
         return productRepository.findByNameContaining(keyword);
     }
+    public List<Product> getProductsByCategory(Long categoryId) {
+        return productRepository.findByCategoryId(categoryId);
+    }
+    public Product getProductBySlug(String slug){
+        return productRepository.findBySlug(slug);
+    }
 }

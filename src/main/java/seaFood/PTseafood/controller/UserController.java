@@ -56,10 +56,11 @@ public class UserController {
         userService.saveUser(registerRequest);
         return ResponseEntity.ok("đăng kí thành công");
     }
-    @PutMapping("/{userId}")
-    public ResponseEntity<?> updateUser(@PathVariable Long userId, @RequestBody UpdateUserRequest updatedUser) {
+    @PutMapping
+    public ResponseEntity<?> updateUser(HttpServletRequest request, @RequestBody UpdateUserRequest updatedUser) {
         try {
-            User updatedUserInfo = userService.updateUser(userId, updatedUser);
+            User user = jwtUtil.getUserFromToken(request);
+            User updatedUserInfo = userService.updateUser(user, updatedUser);
             return ResponseEntity.ok("Cập nhật thành công\n"+updatedUser);
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

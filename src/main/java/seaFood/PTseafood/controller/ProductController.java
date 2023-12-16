@@ -58,4 +58,22 @@ public class ProductController {
         List<Product> topSellingProducts = productVariantService.getTopSellingProducts();
         return ResponseEntity.ok(topSellingProducts);
     }
+    @GetMapping("/products")
+    public List<Product> getAllProduct() {
+        List<Product> products = productService.getAll();
+        return products;
+    }
+    @GetMapping("/category/{categoryId}")
+    public ResponseEntity<List<Product>> getProductsByCategory(@PathVariable Long categoryId) {
+        List<Product> products =productService.getProductsByCategory(categoryId);
+        return ResponseEntity.ok(products);
+    }
+    @GetMapping("/{slug}")
+    public ResponseEntity<?> getProductBySlug(@PathVariable String slug) {
+        Product product =productService.getProductBySlug(slug);
+        if(product == null){
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(product);
+    }
 }
