@@ -18,7 +18,10 @@ public class ExcelService {
     private OrderService orderService;
     //Export ALL_ORDER
     public void excelAllOrder(HttpServletResponse response) throws IOException {
-        response.setContentType("application/octet-stream");
+
+//        response.setContentType("application/octet-stream");
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+
         DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
         String currentDateTime = dateFormatter.format(new Date());
 
@@ -29,6 +32,4 @@ public class ExcelService {
         ExcelGenerator excelGenerator = new ExcelGenerator(listOrder);
         excelGenerator.generateExcelFile(response);
     }
-
-
 }

@@ -15,13 +15,14 @@ import java.io.IOException;
 @CrossOrigin
 @RestController
 @RequestMapping("/api/admin/excel")
-public class ExcelController {
+public class   ExcelController {
 
     @Autowired
     private ExcelService excelService;
     @Autowired
     private OrderService orderService;
 
+    @CrossOrigin(exposedHeaders = "Content-Disposition")
     @GetMapping("/alls")
     public ResponseEntity<String> exportIntoExcelFile(HttpServletResponse response) throws IOException {
         try{
