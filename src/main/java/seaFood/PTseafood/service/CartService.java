@@ -29,67 +29,6 @@ public class CartService {
     @Autowired
     private JwtUtil jwtUtil;
 
-    //    public CartItem  add (CartItemRequest cartItemRequest, User user){
-//            int quantity = cartItemRequest.getQuantity();
-//            Long productId = cartItemRequest.getProductId();
-//            Long productVariantId = cartItemRequest.getProductVariantId();
-//            ProductVariant productVariant = productVariantService.getById(productVariantId);
-//            Product product = productService.getById(productId);
-//            // Kiểm tra xem sản phẩm đã có trong giỏ hàng của người dùng chưa
-//            CartItem existingCartItem = cartRepository.findByUserAndProductVariant(user, productVariant);
-//            double price;
-//            if (product == null) {
-//                throw new ResourceNotFoundException("Sản phẩm không hợp lệ");
-//
-//            }
-//            // Kiểm tra productVariantId có phải là của productId không
-//            if (productVariant == null || productVariant.getProduct().getId() != productId) {
-//                // ném lỗi
-//                throw new ResourceNotFoundException("Sản phẩm không có biến thể");
-//            }
-//            // Kiểm tra số lượng cần mua có hợp lệ hay không
-//            if (quantity <= 0) {
-//                // Thực hiện xử lý lỗi và trả về false
-//                throw new ResourceNotFoundException("Số lượng sản phẩm không được dưới 1");
-//            }
-//            // Kiểm tra số lượng cần mua có đủ không
-//            if (productVariant.getStock() < quantity) {
-//                // Thực hiện xử lý lỗi và trả về false
-//                throw new ResourceNotFoundException("Số lượng sản phẩm chỉ còn lại " + productVariant.getStock());
-//            }
-//             if (existingCartItem == null) {
-//                 // Nếu sản phẩm đã có trong giỏ hàng, thì tăng số lượng (quantity) lên
-//                 System.out.println("Add to Cart 20- Start"+existingCartItem);
-//                 existingCartItem.setQuantity(existingCartItem.getQuantity() + quantity);
-//                 System.out.println("Add to Cart 21- Start"+existingCartItem);
-//                 // Sử dụng giá sỉ nếu user có giá sỉ và giá sỉ có giá trị
-//                 price = (user.isWholeSale() && existingCartItem.getProductVariant().getWhosalePrice() > 0)
-//                             ? existingCartItem.getProductVariant().getWhosalePrice()
-//                             : existingCartItem.getProductVariant().getPrice();
-//                 System.out.println("Add to Cart 20- Start"+price);
-//                 double total = price * existingCartItem.getQuantity();
-//                 System.out.println("Add to Cart 20- Start"+total);
-//                 existingCartItem.setTotal(total);
-//                 System.out.println("Product ex: " + existingCartItem);
-//                 // Lưu cập nhật của mục trong giỏ hàng
-//                 return cartRepository.save(existingCartItem);
-//             }
-//             else {
-//                 CartItem cartItem = new CartItem();
-//                 cartItem.setProduct(product);
-//                 cartItem.setProductVariant(productVariant);
-//                 cartItem.setQuantity(quantity);
-//                 price =  (user.isWholeSale() && productVariant.getWhosalePrice() > 0)
-//                         ? productVariant.getWhosalePrice()
-//                         : productVariant.getPrice();
-//                 double totalPrice = price * quantity;
-//                 cartItem.setUser(user);
-//                 cartItem.setTotal(totalPrice);
-//
-//
-//                 return cartRepository.save(cartItem);
-//             }
-//        }
     public CartItem add(CartItemRequest cartItemRequest, User user) {
         int quantity = cartItemRequest.getQuantity();
         Long productId = cartItemRequest.getProductId();
