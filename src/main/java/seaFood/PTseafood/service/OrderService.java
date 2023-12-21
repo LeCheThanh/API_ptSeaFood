@@ -1,5 +1,6 @@
 package seaFood.PTseafood.service;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -14,7 +15,6 @@ import seaFood.PTseafood.common.Enum;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class OrderService {
@@ -90,33 +90,37 @@ public class OrderService {
             order.setPaymentStatus(Enum.PaymentStatus.UNPAID.getName());
             orderRepository.save(order);
 
-            if(payment.equals("cash")){
-                saveOrder(order,user);
-            }else
-            if(payment.equals("vnpay")){
-                vnPayService.paymentVnPay(finalPrice,user,order.getCode());
-            }else if(payment.equals("momo")){
-                momoService.paymentMomo(finalPrice, user, order.getCode());
-            }
+//            if(payment.equals("cash")){
+//                saveOrder(order,user);
+//            }else
+//            if(payment.equals("vnpay")){
+//                vnPayService.paymentVnPay(finalPrice,user,order.getCode());
+//            }else if(payment.equals("momo")){
+//                momoService.paymentMomo(finalPrice, user, order.getCode());
+//            }
             return order;
     }
 
-    public String saveOrder(Order order, User user){
+    public void saveOrder(Order order, User user){
         Order order1 = getByCode(order.getCode());
-        if(order1 != null) {
             orderDetailService.create(order1, user);
+            System.out.println("Đang check order 4");
             OrderState orderState = new OrderState();
             orderState.setCreatedAt(LocalDateTime.now());
             orderState.setUpdateAt(LocalDateTime.now());
             orderState.setState(Enum.OrderStatus.PENDING_CONFIRMATION.getName());
             orderState.setOrder(order1);
+            System.out.println("Đang check order 6");
             orderStateRepository.save(orderState);
-            mailService.sendConfirmationEmail(order1, user);
+            System.out.println("Đang check order 7");
+
             updateStock(order1);
+            System.out.println("Đang check order 8");
+
+            mailService.sendConfirmationEmail(order1, user);
+            System.out.println("Đang check order 9");
             cartService.clearCart(user);
-            return "Thanh toán đã được xử lý. Mã đơn hàng của bạn là: " + order1.getCode();
-        }
-        return null;
+            System.out.println("Đang check order 5");
     }
 
     //update State by user
@@ -164,6 +168,7 @@ public class OrderService {
     }
 
     //Cập nhật số lượng stock
+    @Transactional
     public void updateStock(Order order){
         List<OrderDetail> orderItems = order.getOrderDetails();
         for (OrderDetail orderItem : orderItems) {
@@ -184,9 +189,7 @@ public class OrderService {
     //Get all order by user
     public List<Order> getAllByUser(User user){
         List<Order> orderByUser = orderRepository.findByUser(user);
-//        if(orderByUser.isEmpty()){
-//            throw new ResourceNotFoundException("User này không có đơn hàng!");
-//        }
+
         return orderByUser;
     }
     ///Thong ke

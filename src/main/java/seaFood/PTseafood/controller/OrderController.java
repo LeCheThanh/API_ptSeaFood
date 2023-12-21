@@ -68,25 +68,28 @@ public class OrderController {
                 return ResponseEntity.badRequest().body("Phương thức thanh toán không hợp lệ");
             }
             Order order = orderService.process(orderRequest, user);
-            if("vnpay".equalsIgnoreCase(orderRequest.getPayment())){
-                    VnPayResponse vnPayResponse = vnPayService.paymentVnPay(order.getFinalPrice(), user,order.getCode());
-                return ResponseEntity.ok(vnPayResponse.getURL());
-            }
-            if("momo".equalsIgnoreCase(orderRequest.getPayment())){
-                MomoResponse momoResponse = momoService.paymentMomo(order.getFinalPrice(), user,order.getCode());
-                return ResponseEntity.ok(momoResponse.getPayUrl());
-            }
+                if("cash".equalsIgnoreCase(orderRequest.getPayment())){
+                    orderService.saveOrder(order,user);
+                }
+                if("vnpay".equalsIgnoreCase(orderRequest.getPayment())){
+                        VnPayResponse vnPayResponse = vnPayService.paymentVnPay(order.getFinalPrice(), user,order.getCode());
+                    return ResponseEntity.ok(vnPayResponse.getURL());
+                }
+                if("momo".equalsIgnoreCase(orderRequest.getPayment())){
+                    MomoResponse momoResponse = momoService.paymentMomo(order.getFinalPrice(), user,order.getCode());
+                    return ResponseEntity.ok(momoResponse.getPayUrl());
+                }
             return ResponseEntity.ok(order);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
     @PutMapping("/{orderId}/update-state")
-    public ResponseEntity<String> updateOrderStateByUser(@PathVariable Long orderId, HttpServletRequest request) {
+    public ResponseEntity<?> updateOrderStateByUser(@PathVariable Long orderId, HttpServletRequest request) {
         try {
             User user = jwtUtil.getUserFromToken(request);
             OrderState updatedOrderState = orderService.updateOrderStateByUser(orderId, user);
-            return ResponseEntity.ok("Cập nhật trạng thái đơn hàng thành công. Trạng thái mới: " + updatedOrderState.getState());
+            return ResponseEntity.ok(updatedOrderState);
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (RuntimeException e) {

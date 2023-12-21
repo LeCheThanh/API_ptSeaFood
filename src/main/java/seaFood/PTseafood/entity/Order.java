@@ -53,7 +53,6 @@ public class Order {
     @Column(name = "note")
     private String note;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderState> orderStates = new ArrayList<>();
 
