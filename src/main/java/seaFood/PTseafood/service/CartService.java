@@ -4,14 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import seaFood.PTseafood.dto.CartItemRequest;
 import seaFood.PTseafood.dto.UpdateCartRequest;
-import seaFood.PTseafood.entity.CartItem;
-import seaFood.PTseafood.entity.Product;
-import seaFood.PTseafood.entity.ProductVariant;
-import seaFood.PTseafood.entity.User;
+import seaFood.PTseafood.entity.*;
 import seaFood.PTseafood.exception.ResourceNotFoundException;
 import seaFood.PTseafood.repository.ICartRepository;
 import seaFood.PTseafood.utils.JwtUtil;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -29,13 +27,15 @@ public class CartService {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private EventService eventService;
+
     public CartItem add(CartItemRequest cartItemRequest, User user) {
         int quantity = cartItemRequest.getQuantity();
         Long productId = cartItemRequest.getProductId();
         Long productVariantId = cartItemRequest.getProductVariantId();
         ProductVariant productVariant = productVariantService.getById(productVariantId);
         Product product = productService.getById(productId);
-
         // Kiểm tra số lượng cần mua có hợp lệ hay không
         if (quantity <= 0) {
             throw new ResourceNotFoundException("Số lượng sản phẩm không được dưới 1");
@@ -58,40 +58,49 @@ public class CartService {
             throw new ResourceNotFoundException("Số lượng sản phẩm chỉ còn lại " + productVariant.getStock());
         }
 
-        double price;
+        double price; // Giá cuối cùng sau khi đã xét đến giảm giá và giá sỉ
 
-        if (existingCartItem != null) {
-            // Nếu sản phẩm đã có trong giỏ hàng, thì tăng số lượng (quantity) lên
-            if(existingCartItem.getQuantity() + quantity > productVariant.getStock()){
-                throw new ResourceNotFoundException("Số lượng sản phẩm chỉ còn lại " + productVariant.getStock());
-            }
-            existingCartItem.setQuantity(existingCartItem.getQuantity() + quantity);
+        // Kiểm tra sự kiện và áp dụng giá giảm nếu có
+        LocalDateTime now = LocalDateTime.now();
+        Event currentEvent = productVariant.getEvent();
+        boolean isEventActive = currentEvent != null &&
+                now.isAfter(currentEvent.getStartTime()) &&
+                now.isBefore(currentEvent.getEndTime());
 
-            // Sử dụng giá sỉ nếu user có giá sỉ và giá sỉ có giá trị
-            price = (user.isWholeSale() && existingCartItem.getProductVariant().getWhosalePrice() > 0)
-                    ? existingCartItem.getProductVariant().getWhosalePrice()
-                    : existingCartItem.getProductVariant().getPrice();
-
-            double total = price * existingCartItem.getQuantity();
-            existingCartItem.setTotal(total);
-
-            // Lưu cập nhật của mục trong giỏ hàng
-            return cartRepository.save(existingCartItem);
+        if (isEventActive) {
+            // Tính giá đã giảm dựa trên discountRate của sự kiện
+            price = eventService.calculateDiscountedPrice(currentEvent, productVariant.getPrice());
         } else {
-            CartItem cartItem = new CartItem();
-            cartItem.setProduct(product);
-            cartItem.setProductVariant(productVariant);
-            cartItem.setQuantity(quantity);
-
+            // Sử dụng giá gốc hoặc giá sỉ nếu không trong thời gian sự kiện hoặc không có sự kiện
             price = (user.isWholeSale() && productVariant.getWhosalePrice() > 0)
                     ? productVariant.getWhosalePrice()
                     : productVariant.getPrice();
-
-            double totalPrice = price * quantity;
-            cartItem.setUser(user);
-            cartItem.setTotal(totalPrice);
-            return cartRepository.save(cartItem);
         }
+
+        double total = price * quantity; // Tính tổng giá dựa trên số lượng và giá
+
+        if (existingCartItem != null) {
+            // Nếu sản phẩm đã có trong giỏ hàng, cập nhật số lượng và tổng giá
+            if(existingCartItem.getQuantity() + quantity > productVariant.getStock()){
+                throw new ResourceNotFoundException("Số lượng sản phẩm chỉ còn lại " + productVariant.getStock());
+            }
+
+            existingCartItem.setQuantity(existingCartItem.getQuantity() + quantity);
+            existingCartItem.setTotal(total + existingCartItem.getTotal()); // Cập nhật tổng giá
+
+            return cartRepository.save(existingCartItem); // Lưu và trả về
+        } else {
+            // Nếu sản phẩm chưa có trong giỏ hàng, thêm sản phẩm mới
+            CartItem cartItem = new CartItem();
+            cartItem.setProductVariant(productVariant);
+            cartItem.setQuantity(quantity);
+            cartItem.setProduct(product);
+            cartItem.setUser(user);
+            cartItem.setTotal(total); // Thiết lập tổng giá cho cart item mới
+
+            return cartRepository.save(cartItem); // Lưu và trả về cartItem mới
+        }
+
     }
 
     ////////////
@@ -130,9 +139,23 @@ public class CartService {
         }
         // Cập nhật số lượng của mục trong giỏ hàng
         cartItem.setQuantity(newQuantity);
-
+        LocalDateTime now = LocalDateTime.now();
+        Event currentEvent = cartItem.getProductVariant().getEvent();
+        boolean isEventActive = currentEvent != null &&
+                now.isAfter(currentEvent.getStartTime()) &&
+                now.isBefore(currentEvent.getEndTime());
+        double price=0.0;
+        if (isEventActive) {
+            // Tính giá đã giảm dựa trên discountRate của sự kiện
+            price = eventService.calculateDiscountedPrice(currentEvent, cartItem.getProductVariant().getPrice());
+        } else {
+            // Sử dụng giá gốc hoặc giá sỉ nếu không trong thời gian sự kiện hoặc không có sự kiện
+            price = (user.isWholeSale() && cartItem.getProductVariant().getWhosalePrice() > 0)
+                    ? cartItem.getProductVariant().getWhosalePrice()
+                    : cartItem.getProductVariant().getPrice();
+        }
         // Tính toán lại tổng giá trị
-        double newTotal = cartItem.getProductVariant().getPrice() * newQuantity;
+        double newTotal = price * newQuantity;
         cartItem.setTotal(newTotal);
 
         // Lưu lại mục giỏ hàng đã cập nhật
