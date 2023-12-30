@@ -83,7 +83,13 @@ public class ExcelGenerator {
         StringBuilder sb = new StringBuilder();
         for (OrderDetail orderDetails : orderDetailList) {
             // Định dạng dữ liệu từ OrderDetails thành một chuỗi và thêm vào StringBuilder
-            sb.append(orderDetails.getProductVariantName().toString()); // Hoặc sử dụng các trường cụ thể của OrderDetails để tạo chuỗi
+//            sb.append(orderDetails.getProductVariantName().toString()); // Hoặc sử dụng các trường cụ thể của OrderDetails để tạo chuỗi
+            String productVariantName = orderDetails.getProductVariantName(); // get variant name
+            String productName = orderDetails.getProductName(); // get product name. Adjust based on actual method names
+
+            // Format and append the product and variant names to the StringBuilder
+            sb.append(productName).append(" - ").append(productVariantName);
+            sb.append(", ");
             sb.append(", ");
         }
         // Loại bỏ ký tự ngăn cách cuối cùng nếu có
