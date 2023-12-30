@@ -42,7 +42,7 @@ public class MomoService {
                 "&orderInfo=" + orderInfo +
                 "&partnerClientId=PTseafood" +
                 "&partnerCode=" + partnerCode +
-                "&redirectUrl=" + redirectUrl+"?orderCode="+code+
+                "&redirectUrl=" + redirectUrl+"?orderCode="+code+"&paymentMethod=momo"+
                 "&requestId="+ requestId +
                 "&requestType=" + requestType;
 
@@ -58,7 +58,7 @@ public class MomoService {
         momoMessage.setAmount(amount);
         momoMessage.setOrderId(orderId);
         momoMessage.setOrderInfo(orderInfo);
-        momoMessage.setRedirectUrl(redirectUrl+"?orderCode="+code);
+        momoMessage.setRedirectUrl(redirectUrl+"?orderCode="+code+"&paymentMethod=momo");
         momoMessage.setIpnUrl(ipnUrl);
         momoMessage.setLang("vi");
         momoMessage.setExtraData(extraData);

@@ -9,11 +9,16 @@ import java.security.NoSuchAlgorithmException;
 public class MomoConfig {
 
     public static String endPoint = "https://test-payment.momo.vn/v2/gateway/api/create";
+//    MOMOOJOI20210710
     public static String partnerCode = "MOMOOJOI20210710";
+
+
+//            iPXneGmrJH0G8FOP
     public static String accessKey  ="iPXneGmrJH0G8FOP";
+//            sFcbSGRSJjwGxwhhcEktCHWYUuTuPNDB
     public static  String secretKey = "sFcbSGRSJjwGxwhhcEktCHWYUuTuPNDB";
     public static  String ipnUrl = "https://webhook.site/8e055cf5-a2e1-408a-bcb6-1ec9ff5f5007";
-    public static String redirectUrl = "http://localhost:8080/api/payment/momoResult";
+    public static String redirectUrl = "http://localhost:3000/payment-result";
 
     private static final String HMAC_SHA256_ALGORITHM = "HmacSHA256";
 
