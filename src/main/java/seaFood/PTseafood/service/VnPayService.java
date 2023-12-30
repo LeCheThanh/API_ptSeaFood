@@ -38,7 +38,7 @@ public class VnPayService {
 
         vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
         vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang:" + vnp_TxnRef);
-        vnp_Params.put("vnp_ReturnUrl", VnPayConfig.vnp_ReturnUrl+"?orderCode="+code);
+        vnp_Params.put("vnp_ReturnUrl", VnPayConfig.vnp_ReturnUrl+"?orderCode="+code+"&paymentMethod=vnpay");
 
 
         Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
