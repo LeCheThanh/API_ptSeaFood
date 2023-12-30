@@ -12,15 +12,13 @@ import seaFood.PTseafood.entity.Order;
 import seaFood.PTseafood.entity.OrderState;
 import seaFood.PTseafood.entity.User;
 import seaFood.PTseafood.exception.ResourceNotFoundException;
-import seaFood.PTseafood.service.MailService;
-import seaFood.PTseafood.service.MomoService;
-import seaFood.PTseafood.service.OrderService;
-import seaFood.PTseafood.service.VnPayService;
+import seaFood.PTseafood.service.*;
 import seaFood.PTseafood.utils.EmailValidator;
 import seaFood.PTseafood.utils.JwtUtil;
 import seaFood.PTseafood.utils.PhoneNumberValidator;
 
 import java.util.List;
+import java.util.Map;
 
 @CrossOrigin
 @RestController
@@ -68,17 +66,23 @@ public class OrderController {
                 return ResponseEntity.badRequest().body("Phương thức thanh toán không hợp lệ");
             }
             Order order = orderService.process(orderRequest, user);
-                if("cash".equalsIgnoreCase(orderRequest.getPayment())){
-                    orderService.saveOrder(order,user);
-                }
-                if("vnpay".equalsIgnoreCase(orderRequest.getPayment())){
+//            if("cash".equalsIgnoreCase(orderRequest.getPayment())){
+//                    orderService.saveOrder(order,user);
+//                    return ResponseEntity.ok(order);
+//            }
+            if ("cash".equalsIgnoreCase(orderRequest.getPayment())) {
+                // Khi thanh toán bằng cash, trả về mã đơn hàng để xử lý sau
+                String responseUrl = "http://localhost:3000/payment-result?orderCode=" + order.getCode()+"&paymentMethod=cash";
+                return ResponseEntity.ok(responseUrl);
+            }
+            if("vnpay".equalsIgnoreCase(orderRequest.getPayment())){
                         VnPayResponse vnPayResponse = vnPayService.paymentVnPay(order.getFinalPrice(), user,order.getCode());
                     return ResponseEntity.ok(vnPayResponse.getURL());
-                }
-                if("momo".equalsIgnoreCase(orderRequest.getPayment())){
+            }
+            if("momo".equalsIgnoreCase(orderRequest.getPayment())){
                     MomoResponse momoResponse = momoService.paymentMomo(order.getFinalPrice(), user,order.getCode());
                     return ResponseEntity.ok(momoResponse.getPayUrl());
-                }
+            }
             return ResponseEntity.ok(order);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());

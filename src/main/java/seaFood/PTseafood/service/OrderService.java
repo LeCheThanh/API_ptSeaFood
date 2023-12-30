@@ -1,6 +1,7 @@
 package seaFood.PTseafood.service;
 
 import jakarta.transaction.Transactional;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -90,38 +91,63 @@ public class OrderService {
             order.setPaymentStatus(Enum.PaymentStatus.UNPAID.getName());
             orderRepository.save(order);
 
-//            if(payment.equals("cash")){
-//                saveOrder(order,user);
-//            }else
-//            if(payment.equals("vnpay")){
-//                vnPayService.paymentVnPay(finalPrice,user,order.getCode());
-//            }else if(payment.equals("momo")){
-//                momoService.paymentMomo(finalPrice, user, order.getCode());
-//            }
+
             return order;
     }
 
-    public void saveOrder(Order order, User user){
-        Order order1 = getByCode(order.getCode());
-            orderDetailService.create(order1, user);
-            System.out.println("Đang check order 4");
-            OrderState orderState = new OrderState();
-            orderState.setCreatedAt(LocalDateTime.now());
-            orderState.setUpdateAt(LocalDateTime.now());
-            orderState.setState(Enum.OrderStatus.PENDING_CONFIRMATION.getName());
-            orderState.setOrder(order1);
-            System.out.println("Đang check order 6");
-            orderStateRepository.save(orderState);
-            System.out.println("Đang check order 7");
+//    public void saveOrder(Order order, User user){
+//            orderDetailService.create(order, user);
+//            System.out.println("Đang check order 4");
+//            OrderState orderState = new OrderState();
+//            orderState.setCreatedAt(LocalDateTime.now());
+//            orderState.setUpdateAt(LocalDateTime.now());
+//            orderState.setState(Enum.OrderStatus.PENDING_CONFIRMATION.getName());
+//            orderState.setOrder(order);
+//            System.out.println("Đang check order 6");
+//            orderStateRepository.save(orderState);
+//            System.out.println("Đang check order 7");
+//
+//            updateStock(order);
+//            System.out.println("Đang check order 8");
+//
+//            mailService.sendConfirmationEmail(order, user);
+//            System.out.println("Đang check order 9");
+//            cartService.clearCart(user);
+//            System.out.println("Đang check order 5");
+//    }
+public void saveOrder(Order order, User user){
+    try {
+        // Create order details
+        orderDetailService.create(order, user);
+        System.out.println("Order details created for order " + order.getCode());
 
-            updateStock(order1);
-            System.out.println("Đang check order 8");
+        // Update order state
+        OrderState orderState = new OrderState();
+        orderState.setCreatedAt(LocalDateTime.now());
+        orderState.setUpdateAt(LocalDateTime.now());
+        orderState.setState(Enum.OrderStatus.PENDING_CONFIRMATION.getName());
+        orderState.setOrder(order);
+        orderStateRepository.save(orderState);
+        System.out.println("Order state updated for order " + order.getCode());
 
-            mailService.sendConfirmationEmail(order1, user);
-            System.out.println("Đang check order 9");
-            cartService.clearCart(user);
-            System.out.println("Đang check order 5");
+        // Update stock
+        updateStock(order);
+        System.out.println("Stock updated for order " + order.getCode());
+
+        // Send confirmation email
+        mailService.sendConfirmationEmail(order, user);
+        System.out.println("Confirmation email sent for order " + order.getCode());
+
+        // Clear the user's cart
+        cartService.clearCart(user);
+        System.out.println("Cart cleared for user " + user.getId());
+    } catch (Exception e) {
+        // Log the error for debugging purposes
+        e.printStackTrace();
+        System.err.println("Error saving order: " + e.getMessage());
     }
+}
+
 
     //update State by user
     public OrderState updateOrderStateByUser(Long orderId,User user) {
@@ -169,22 +195,28 @@ public class OrderService {
 
     //Cập nhật số lượng stock
     @Transactional
-    public void updateStock(Order order){
+    public void updateStock(@NotNull Order order) {
         List<OrderDetail> orderItems = order.getOrderDetails();
         for (OrderDetail orderItem : orderItems) {
             ProductVariant productVariant = orderItem.getProductVariant();
             int quantity = orderItem.getQuantity();
-
+            System.out.println("Số lượng mua: " + quantity);
             // Cập nhật số lượng tồn kho
-            int newStock = productVariant.getStock() - quantity;
+            int currentStock = productVariant.getStock();
+            int newStock = currentStock - quantity;
+            System.out.println("Số lượng tồn kho mới: " + newStock);
             productVariant.setStock(newStock);
 
-            int newSoldQuantity = productVariant.getSoldQuantity() + quantity;
+            // Cập nhật số lượng đã bán
+            int currentSoldQuantity = productVariant.getSoldQuantity();
+            int newSoldQuantity = currentSoldQuantity + quantity;
             productVariant.setSoldQuantity(newSoldQuantity);
+            System.out.println("Số lượng đã bán mới: " + newSoldQuantity);
 
+            // Lưu cập nhật vào cơ sở dữ liệu
             productVariantService.save(productVariant);
+            System.out.println("Đã cập nhật thông tin sản phẩm: " + productVariant.getId());
         }
-
     }
     //Get all order by user
     public List<Order> getAllByUser(User user){

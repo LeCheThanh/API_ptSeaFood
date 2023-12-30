@@ -22,8 +22,9 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-@CrossOrigin
+
 @RestController
+@CrossOrigin
 @RequestMapping("/api/payment")
 public class PaymentController {
     @Autowired
@@ -42,18 +43,46 @@ public class PaymentController {
     private UserService userService;
     // Định dạng của chuỗi ngày giờ
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+    @GetMapping("/cashResult")
+    public ResponseEntity<?> processOrder(@RequestParam String orderCode) {
+        try {
+            Order order = orderService.getByCode(orderCode);
+            if (order == null) {
+                return ResponseEntity.badRequest().body("Không tìm thấy đơn hàng với mã: " + orderCode);
+            }
+            User user = order.getUser();
+            if (user == null) {
+                return ResponseEntity.badRequest().body("Không tìm thấy người dùng cho đơn hàng này.");
+            }
+
+            // Nếu đơn hàng chưa được xử lý, hãy tiếp tục xử lý và cập nhật kho
+            if (order != null) {
+                orderService.saveOrder(order, user);
+            }
+
+            return ResponseEntity.ok("Đơn hàng " + orderCode + " đã được xử lý thành công.");
+
+        } catch (Exception e) {
+            // Xử lý lỗi
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
     @GetMapping("/vnpayResult")
-    public ResponseEntity<?> vnpayResult(@RequestParam("vnp_ResponseCode") String vnp_ResponseCode, HttpServletRequest request,
+    public ResponseEntity<?> vnpayResult(HttpServletRequest request,
+                                         @RequestParam("vnp_ResponseCode") String vnp_ResponseCode,
                                          @RequestParam String orderCode,
                                          @RequestParam("vnp_TransactionNo") String vnp_TransactionNo,
                                          @RequestParam("vnp_Amount") String vnp_Amount,
                                          @RequestParam("vnp_PayDate") String vnp_PayDate)
     {
+        System.out.println("vnpayResult called at: " + LocalDateTime.now() + " with params: " + vnp_ResponseCode +
+                orderCode+ vnp_TransactionNo +vnp_Amount+ vnp_PayDate);
+        System.out.println("Đang check order 00");
         User user  = jwtUtil.getUserFromToken(request);
         TransactionResponse transactionResponse = new TransactionResponse();
         Order order = orderService.getByCode(orderCode);
         VnPayTransaction vnPayTransaction = new VnPayTransaction();
-
+        System.out.println("Đang check order 00");
         // Chuyển đổi từ chuỗi sang LocalDateTime
         LocalDateTime paymentTime = LocalDateTime.parse(vnp_PayDate, formatter);
         //String sang doub
@@ -62,17 +91,16 @@ public class PaymentController {
         if (vnp_ResponseCode.equals("00")) {
             transactionResponse.setStatus("Ok");
             transactionResponse.setMessage("Successfully");
-            if(order==null){
-                return ResponseEntity.badRequest().body("Không tìm thấy order!");
-            }
+            System.out.println("Đang check order 1");
             order.setPaymentStatus(Enum.PaymentStatus.PAID.getName());
+            System.out.println("Đang check order 2");
             // Thêm Order States "ĐÃ THANH TOÁN"
             orderService.saveOrder(order, user);
+            System.out.println("Đang check order 3");
             // Cộng tiền đã mua vào user
             double adjustedPaymentAmount = paymentAmount / 100.0;
             BigInteger purchaseAmount = BigInteger.valueOf((long) adjustedPaymentAmount); // Chuyển đổi từ double sang BigInteger
             userService.updateTotalUserPurchase(user, purchaseAmount);
-
             //lưu vnpaytransaction
             vnPayTransaction.setPaymentStatus(Enum.PaymentStatus.PAID.getName());
             vnPayTransaction.setResponseCode(vnp_ResponseCode);
@@ -159,5 +187,10 @@ public class PaymentController {
 
         return ResponseEntity.internalServerError().body("Thanh toán thất bại");
 
+    }
+    @GetMapping("/testEndpoint")
+    public ResponseEntity<?> testEndpoint() {
+        System.out.println("Test endpoint call at: " + LocalDateTime.now());
+        return ResponseEntity.ok("Test Endpoint Response");
     }
 }
